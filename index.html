@@ -54,7 +54,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 48px 16px 120px;
+            padding: 48px 16px 60px;
         }
 
         /* ─── LOGO ───────────────────────────────────────────── */
@@ -122,6 +122,78 @@
             cursor: default;
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* ─── AJUSTE 1: TELA CHEIA (falsa, via CSS) ───────────── */
+        body.video-fullscreen-active { overflow: hidden; }
+
+        .video-card.fake-fullscreen {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            z-index: 99999;
+            background: #000;
+        }
+        .video-card.fake-fullscreen .video-ratio {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            padding-bottom: 0;
+            overflow: hidden;
+        }
+        .video-card.fake-fullscreen .video-ratio #player,
+        .video-card.fake-fullscreen .video-ratio iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            inset: auto;
+        }
+        .video-card.fake-fullscreen .progress-track,
+        .video-card.fake-fullscreen .progress-meta {
+            display: none;
+        }
+
+        /* ─── AJUSTE 3: CONTROLES CUSTOMIZADOS ────────────────── */
+        .video-controls {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            z-index: 30;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .video-controls.active { display: flex; }
+        .vc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s ease;
+        }
+        .vc-btn:hover, .vc-btn:active { background: rgba(0,0,0,0.85); }
+        .vc-btn svg { width: 18px; height: 18px; fill: #fff; pointer-events: none; }
 
         /* ─── CLICK-TO-PLAY OVERLAY ──────────────────────────── */
         .overlay {
@@ -212,26 +284,25 @@
             color: var(--red);
         }
 
-        /* ─── CTA BUTTON ─────────────────────────────────────── */
+        /* ─── CTA BUTTON (embutido, logo abaixo do vídeo) ─────── */
         #cta-wrap {
-            position: fixed;
-            bottom: 0;
-            left: 0;
             width: 100%;
-            padding: 20px 16px 28px;
-            background: linear-gradient(to top, rgba(0,0,0,0.98) 60%, transparent);
+            max-width: 820px;
+            margin-top: 22px;
             display: flex;
             justify-content: center;
-            z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
         }
         #cta-wrap.visible {
             opacity: 1;
             pointer-events: auto;
             transform: translateY(0);
+            max-height: 200px;
         }
 
         .cta-btn {
@@ -262,6 +333,70 @@
         .cta-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
         .cta-btn:hover { box-shadow: 0 0 0 2px rgba(229,9,20,0.6), 0 0 60px rgba(229,9,20,0.7), 0 4px 24px rgba(0,0,0,0.6); }
 
+        /* ─── AJUSTE 2: CARROSSEL DE PROVA SOCIAL ─────────────── */
+        #social-proof-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 22px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease;
+        }
+        #social-proof-wrap.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 600px;
+        }
+        .carousel-outer {
+            position: relative;
+            width: 100%;
+            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+        }
+        .carousel-track {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 4px 32px;
+            cursor: grab;
+            user-select: none;
+        }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-track.dragging { cursor: grabbing; scroll-snap-type: none; }
+        .carousel-slide {
+            flex: 0 0 78%;
+            max-width: 320px;
+            aspect-ratio: 4 / 5;
+            scroll-snap-align: center;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-align: center;
+            padding: 12px;
+            pointer-events: none;
+        }
+        @media (max-width: 600px) {
+            .carousel-slide { flex: 0 0 82%; }
+        }
+
         /* ─── ANIMATIONS ─────────────────────────────────────── */
         @keyframes pulse-icon {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -278,14 +413,10 @@
 
         /* ─── MOBILE ─────────────────────────────────────────── */
            @media (max-width: 600px) {
-    .page { padding: 28px 8px 110px; }
+    .page { padding: 28px 8px 48px; }
     .logo { font-size: 1.6rem; margin-bottom: 22px; }
     .video-card { border-radius: 6px; }
     .cta-btn { font-size: 1.1rem; padding: 16px 24px; }
-
-    #cta-wrap {
-        bottom: 120px;
-    }
 }
     </style>
 </head>
@@ -309,6 +440,17 @@
             <div id="player"></div>
             <!-- Blocks all native YouTube clicks (pause, seek, info cards, etc.) -->
             <div class="video-blocker" id="blocker"></div>
+
+            <!-- AJUSTE 3: Controles próprios (play/pause, velocidade, tela cheia) -->
+            <div class="video-controls" id="videoControls">
+                <button type="button" class="vc-btn" id="btnPlayPause" aria-label="Play/Pause">
+                    <svg id="iconPlayPause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button type="button" class="vc-btn" id="btnSpeed" aria-label="Velocidade">1x</button>
+                <button type="button" class="vc-btn" id="btnFullscreen" aria-label="Tela cheia">
+                    <svg id="iconFullscreen" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+            </div>
         </div>
 
         <!-- Click-to-play overlay -->
@@ -333,23 +475,41 @@
 
     </div><!-- /.video-card -->
 
-</div><!-- /.page -->
+    <!-- CTA — appears at 4:43, logo abaixo do vídeo -->
+    <div id="cta-wrap">
+        <!--
+            ┌──────────────────────────────────────────────────────────┐
+            │  INSIRA o link de destino no atributo href abaixo:       │
+            │  <a href="SEU_LINK_AQUI" ...>                            │
+            └──────────────────────────────────────────────────────────┘
+        -->
+        <a href="https://wa.me/message/SA53EQAF7RTVH1/" class="cta-btn" id="ctaBtn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            Acessar a STEAM PREMIUM agora
+        </a>
+    </div>
 
-<!-- CTA — appears at 4:43 -->
-<div id="cta-wrap">
-    <!--
-        ┌──────────────────────────────────────────────────────────┐
-        │  INSIRA o link de destino no atributo href abaixo:       │
-        │  <a href="SEU_LINK_AQUI" ...>                            │
-        └──────────────────────────────────────────────────────────┘
-    -->
-    <a href="https://wa.me/message/SA53EQAF7RTVH1/" class="cta-btn" id="ctaBtn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5v14l11-7z"/>
-        </svg>
-        Acessar a STEAM PREMIUM agora
-    </a>
-</div>
+    <!-- AJUSTE 2: Carrossel de prova social — mesma largura do vídeo -->
+    <div id="social-proof-wrap">
+        <div class="carousel-outer">
+            <div class="carousel-track" id="carouselTrack">
+                <!--
+                    ┌──────────────────────────────────────────────────────────┐
+                    │  Para colocar suas imagens, troque o background-image    │
+                    │  de cada slide abaixo por:                                │
+                    │  style="background-image:url('SUA_IMAGEM.jpg')"          │
+                    └──────────────────────────────────────────────────────────┘
+                -->
+                <div class="carousel-slide">Imagem de prova social 1</div>
+                <div class="carousel-slide">Imagem de prova social 2</div>
+                <div class="carousel-slide">Imagem de prova social 3</div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /.page -->
 
 <!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -366,6 +526,15 @@
     let progressInterval = null;
     let ctaTimer         = null;
     let started          = false;
+
+    /* Ajuste 1 / 3 — estado dos controles e da tela cheia */
+    let isPaused      = false;
+    let userPaused     = false;
+    let speedIndex     = 0;
+    const SPEED_STEPS  = [1, 1.5, 2];
+    let isFullscreen   = false;
+    let videoEnded      = false;
+    let ctaShown        = false;
 
     /* ── YouTube Player ready ── */
     function onYouTubeIframeAPIReady() {
@@ -396,9 +565,27 @@
     }
 
     function onPlayerStateChange(e) {
-        /* Keep playing if paused externally */
-        if (e.data === YT.PlayerState.PAUSED && started) {
+        /* Keep playing if paused externally (mas não se foi o próprio usuário
+           que pausou pelo botão de play/pause customizado) */
+        if (e.data === YT.PlayerState.PAUSED && started && !userPaused) {
             setTimeout(() => { try { player.playVideo(); } catch(_){} }, 200);
+        }
+
+        if (e.data === YT.PlayerState.PLAYING) {
+            isPaused = false;
+            updatePlayPauseIcon();
+        }
+        if (e.data === YT.PlayerState.PAUSED) {
+            isPaused = true;
+            updatePlayPauseIcon();
+        }
+
+        /* AJUSTE 1: quando o vídeo termina, se o CTA já foi liberado,
+           sai da tela cheia automaticamente. Caso contrário, marca a flag
+           e a saída acontece quando o CTA aparecer (ver showCTA). */
+        if (e.data === YT.PlayerState.ENDED) {
+            videoEnded = true;
+            if (ctaShown) exitFakeFullscreen();
         }
     }
 
@@ -418,6 +605,12 @@
 
         startFakeProgress();
         scheduleCTA();
+
+        /* Mostra os controles customizados */
+        document.getElementById('videoControls').classList.add('active');
+
+        /* AJUSTE 1: ao clicar, entra em tela cheia (falsa, via CSS) */
+        enterFakeFullscreen();
     }
 
     /* ── Fake progress bar ──────────────────────────────────────
@@ -463,10 +656,100 @@
 
         /* Reveal CTA */
         document.getElementById('cta-wrap').classList.add('visible');
+        document.getElementById('social-proof-wrap').classList.add('visible');
 
         /* Update link with the redirect URL */
         document.getElementById('ctaBtn').href = REDIRECT;
+
+        /* AJUSTE 1: vídeo terminou E botão liberado → sai da tela cheia */
+        ctaShown = true;
+        if (videoEnded) exitFakeFullscreen();
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 3 — Controles customizados
+       ═══════════════════════════════════════════════════════════ */
+    const ICON_PLAY  = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>';
+    const ICON_PAUSE = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+    function updatePlayPauseIcon() {
+        const icon = document.getElementById('iconPlayPause');
+        if (icon) icon.outerHTML = isPaused ? ICON_PLAY.replace('<svg ', '<svg id="iconPlayPause" ') : ICON_PAUSE.replace('<svg ', '<svg id="iconPlayPause" ');
+    }
+
+    document.getElementById('btnPlayPause').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!started || !player) return;
+        if (isPaused) {
+            userPaused = false;
+            player.playVideo();
+        } else {
+            userPaused = true;
+            player.pauseVideo();
+        }
+    });
+
+    document.getElementById('btnSpeed').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!started || !player) return;
+        speedIndex = (speedIndex + 1) % SPEED_STEPS.length;
+        const rate = SPEED_STEPS[speedIndex];
+        try { player.setPlaybackRate(rate); } catch(_){}
+        document.getElementById('btnSpeed').textContent = rate + 'x';
+    });
+
+    document.getElementById('btnFullscreen').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isFullscreen) exitFakeFullscreen(); else enterFakeFullscreen();
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 1 — Tela cheia falsa (via CSS, sem controles nativos)
+       ═══════════════════════════════════════════════════════════ */
+    function enterFakeFullscreen() {
+        if (isFullscreen) return;
+        isFullscreen = true;
+        document.querySelector('.video-card').classList.add('fake-fullscreen');
+        document.body.classList.add('video-fullscreen-active');
+    }
+
+    function exitFakeFullscreen() {
+        if (!isFullscreen) return;
+        isFullscreen = false;
+        document.querySelector('.video-card').classList.remove('fake-fullscreen');
+        document.body.classList.remove('video-fullscreen-active');
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 2 — Carrossel de prova social (arrastar para o lado)
+       ═══════════════════════════════════════════════════════════ */
+    (function initCarousel() {
+        const track = document.getElementById('carouselTrack');
+        if (!track) return;
+
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+
+        track.addEventListener('mousedown', (e) => {
+            isDown = true;
+            track.classList.add('dragging');
+            startX = e.pageX;
+            scrollStart = track.scrollLeft;
+        });
+        window.addEventListener('mouseup', () => {
+            isDown = false;
+            track.classList.remove('dragging');
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const delta = e.pageX - startX;
+            track.scrollLeft = scrollStart - delta;
+        });
+
+        /* Touch já funciona nativamente via overflow-x + scroll-snap */
+    })();
 
     /* ── Prevent right-click context menu on the video area ── */
     document.addEventListener('contextmenu', e => {
