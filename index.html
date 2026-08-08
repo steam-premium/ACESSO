@@ -126,10 +126,12 @@
         /* ─── AJUSTE 1: TELA CHEIA (nativa do navegador, Fullscreen API) ───────────── */
         body.video-fullscreen-active { overflow: hidden; }
 
-        /* Quando o .video-card está em fullscreen nativo, o navegador aplica
-           :fullscreen a ele. Ajustamos para ocupar 100% e centralizar o vídeo. */
-        .video-card:fullscreen,
-        .video-card:-webkit-full-screen {
+        /* Fullscreen "falso" via CSS (não depende da Fullscreen API nativa,
+           que não é suportada em elementos arbitrários no Safari/iOS).
+           Funciona em qualquer dispositivo, inclusive celular. */
+        .video-card.fake-fs-active {
+            position: fixed;
+            inset: 0;
             width: 100vw;
             height: 100vh;
             max-width: none;
@@ -140,27 +142,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 9998;
         }
-        .video-card:fullscreen .video-ratio,
-        .video-card:-webkit-full-screen .video-ratio {
+        .video-card.fake-fs-active .video-ratio {
             width: 100%;
             height: 100%;
             padding-bottom: 0;
             overflow: hidden;
         }
-        .video-card:fullscreen .video-ratio #player,
-        .video-card:fullscreen .video-ratio iframe,
-        .video-card:-webkit-full-screen .video-ratio #player,
-        .video-card:-webkit-full-screen .video-ratio iframe {
+        .video-card.fake-fs-active .video-ratio #player,
+        .video-card.fake-fs-active .video-ratio iframe {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
         }
-        .video-card:fullscreen .progress-track,
-        .video-card:fullscreen .progress-meta,
-        .video-card:-webkit-full-screen .progress-track,
-        .video-card:-webkit-full-screen .progress-meta {
+        .video-card.fake-fs-active .progress-track,
+        .video-card.fake-fs-active .progress-meta {
             display: none;
         }
 
@@ -400,6 +398,57 @@
             .carousel-slide { flex: 0 0 82%; }
         }
 
+        /* ─── BOTÃO DE WHATSAPP (abaixo do carrossel) ─────────── */
+        #whatsapp-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
+        }
+        #whatsapp-wrap.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 200px;
+        }
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 40px;
+            max-width: 500px;
+            width: 100%;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #1b8a3d 0%, #25d366 55%, #34e37a 100%);
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            box-shadow:
+                0 0 0 2px rgba(37,211,102,0.25),
+                0 0 32px rgba(37,211,102,0.4),
+                0 4px 24px rgba(0,0,0,0.6);
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .whatsapp-btn:hover {
+            box-shadow: 0 0 0 2px rgba(37,211,102,0.55), 0 0 46px rgba(37,211,102,0.6), 0 4px 24px rgba(0,0,0,0.6);
+            transform: translateY(-2px);
+        }
+        .whatsapp-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
+
         /* ─── ANIMATIONS ─────────────────────────────────────── */
         @keyframes pulse-icon {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -494,8 +543,8 @@
         </a>
     </div>
 
-    <!-- AJUSTE 2: Carrossel de prova social — mesma largura do vídeo -->
-    <div id="social-proof-wrap">
+    <!-- AJUSTE 2: Carrossel de prova social — mesma largura do vídeo — visível desde o início -->
+    <div id="social-proof-wrap" class="visible">
         <div class="carousel-outer">
             <div class="carousel-track" id="carouselTrack">
                 <!--
@@ -512,6 +561,23 @@
         </div>
     </div>
 
+    <!-- Botão de WhatsApp — abaixo do carrossel -->
+    <div id="whatsapp-wrap">
+        <!--
+            ┌──────────────────────────────────────────────────────────┐
+            │  INSIRA seu número no formato internacional, sem espaços  │
+            │  ou símbolos, no lugar de "5500000000000" abaixo:         │
+            │  Ex: 55 + DDD + número → 5551999999999                    │
+            └──────────────────────────────────────────────────────────┘
+        -->
+        <a href="https://wa.me/5500000000000?text=Acabei%20de%20assistir%20o%20v%C3%ADdeo%20e%20gostaria%20de%20tirar%20algumas%20d%C3%BAvidas." class="whatsapp-btn" id="whatsappBtn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.48 1.32 5.01L2.05 22l5.25-1.37a9.94 9.94 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.93 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.55-3.7 8.25-8.25 8.25a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.55 3.71-8.25 8.26-8.25M8.53 6.85c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2.03 0 1.2.87 2.36.99 2.52.12.16 1.7 2.72 4.2 3.71 2.08.82 2.5.66 2.95.62.45-.04 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28-.24-.12-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.12-.16.24-.63.8-.78.96-.14.16-.29.18-.53.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.35-1.67-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.34-.76-1.83-.2-.48-.4-.4-.55-.41-.14 0-.3-.01-.46-.01z"/>
+            </svg>
+            Ficou com alguma dúvida? Fale no WhatsApp
+        </a>
+    </div>
+
 </div><!-- /.page -->
 
 <!-- YouTube IFrame API -->
@@ -522,7 +588,7 @@
        ═══════════════════════════════════════════════════════════ */
     const VIDEO_ID    = 'dL2QHhxPSlY';          // ← ID do vídeo do YouTube
     const REDIRECT    = 'https://wa.me/message/SA53EQAF7RTVH1/'; // ← URL de destino
-    const CTA_SECOND  = 7;                     // 4 min 43 s  (não altere)
+    const CTA_SECOND  = 2;                     // 4 min 43 s  (não altere)
     /* ═══════════════════════════════════════════════════════════ */
 
     let player;
@@ -632,6 +698,7 @@
     let elapsedSec = 0;
 
     function startFakeProgress() {
+        clearInterval(progressInterval);
         progressInterval = setInterval(() => {
             elapsedSec += 0.5;
             const pct = easeProgress(elapsedSec);
@@ -660,6 +727,7 @@
         /* Reveal CTA */
         document.getElementById('cta-wrap').classList.add('visible');
         document.getElementById('social-proof-wrap').classList.add('visible');
+        document.getElementById('whatsapp-wrap').classList.add('visible');
 
         /* Update link with the redirect URL */
         document.getElementById('ctaBtn').href = REDIRECT;
@@ -686,9 +754,11 @@
         if (isPaused) {
             userPaused = false;
             player.playVideo();
+            startFakeProgress(); /* retoma a barra de progresso do ponto em que parou */
         } else {
             userPaused = true;
             player.pauseVideo();
+            clearInterval(progressInterval); /* pausa a barra de progresso junto com o vídeo */
         }
     });
 
@@ -714,36 +784,16 @@
         isFullscreen = true;
         const el = document.querySelector('.video-card');
         document.body.classList.add('video-fullscreen-active');
-        try {
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.msRequestFullscreen) el.msRequestFullscreen();
-        } catch(err) { console.warn('Fullscreen request failed', err); }
+        el.classList.add('fake-fs-active');
     }
 
     function exitFakeFullscreen() {
         if (!isFullscreen) return;
         isFullscreen = false;
+        const el = document.querySelector('.video-card');
         document.body.classList.remove('video-fullscreen-active');
-        try {
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
-        } catch(err) { console.warn('Fullscreen exit failed', err); }
+        el.classList.remove('fake-fs-active');
     }
-
-    /* Mantém isFullscreen sincronizado caso o usuário saia do fullscreen
-       usando o ESC ou o próprio controle do sistema/navegador */
-    function handleFullscreenChange() {
-        const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-        if (!fsEl) {
-            isFullscreen = false;
-            document.body.classList.remove('video-fullscreen-active');
-        }
-    }
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
     /* ═══════════════════════════════════════════════════════════
        AJUSTE 2 — Carrossel de prova social (arrastar para o lado)
