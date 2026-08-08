@@ -123,41 +123,44 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ─── AJUSTE 1: TELA CHEIA (falsa, via CSS) ───────────── */
+        /* ─── AJUSTE 1: TELA CHEIA (nativa do navegador, Fullscreen API) ───────────── */
         body.video-fullscreen-active { overflow: hidden; }
 
-        .video-card.fake-fullscreen {
-            position: fixed;
-            inset: 0;
+        /* Quando o .video-card está em fullscreen nativo, o navegador aplica
+           :fullscreen a ele. Ajustamos para ocupar 100% e centralizar o vídeo. */
+        .video-card:fullscreen,
+        .video-card:-webkit-full-screen {
             width: 100vw;
             height: 100vh;
             max-width: none;
             border-radius: 0;
             border: none;
             box-shadow: none;
-            z-index: 99999;
             background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .video-card.fake-fullscreen .video-ratio {
-            position: absolute;
-            inset: 0;
+        .video-card:fullscreen .video-ratio,
+        .video-card:-webkit-full-screen .video-ratio {
             width: 100%;
             height: 100%;
             padding-bottom: 0;
             overflow: hidden;
         }
-        .video-card.fake-fullscreen .video-ratio #player,
-        .video-card.fake-fullscreen .video-ratio iframe {
+        .video-card:fullscreen .video-ratio #player,
+        .video-card:fullscreen .video-ratio iframe,
+        .video-card:-webkit-full-screen .video-ratio #player,
+        .video-card:-webkit-full-screen .video-ratio iframe {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            inset: 0;
             width: 100%;
             height: 100%;
-            inset: auto;
         }
-        .video-card.fake-fullscreen .progress-track,
-        .video-card.fake-fullscreen .progress-meta {
+        .video-card:fullscreen .progress-track,
+        .video-card:fullscreen .progress-meta,
+        .video-card:-webkit-full-screen .progress-track,
+        .video-card:-webkit-full-screen .progress-meta {
             display: none;
         }
 
@@ -709,16 +712,38 @@
     function enterFakeFullscreen() {
         if (isFullscreen) return;
         isFullscreen = true;
-        document.querySelector('.video-card').classList.add('fake-fullscreen');
+        const el = document.querySelector('.video-card');
         document.body.classList.add('video-fullscreen-active');
+        try {
+            if (el.requestFullscreen) el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            else if (el.msRequestFullscreen) el.msRequestFullscreen();
+        } catch(err) { console.warn('Fullscreen request failed', err); }
     }
 
     function exitFakeFullscreen() {
         if (!isFullscreen) return;
         isFullscreen = false;
-        document.querySelector('.video-card').classList.remove('fake-fullscreen');
         document.body.classList.remove('video-fullscreen-active');
+        try {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        } catch(err) { console.warn('Fullscreen exit failed', err); }
     }
+
+    /* Mantém isFullscreen sincronizado caso o usuário saia do fullscreen
+       usando o ESC ou o próprio controle do sistema/navegador */
+    function handleFullscreenChange() {
+        const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (!fsEl) {
+            isFullscreen = false;
+            document.body.classList.remove('video-fullscreen-active');
+        }
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
     /* ═══════════════════════════════════════════════════════════
        AJUSTE 2 — Carrossel de prova social (arrastar para o lado)
