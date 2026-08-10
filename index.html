@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Premium — Como ter todos jogos com 100% de desconto</title>
+    <title>Steam Premium — Capas de Jogos da Steam para Colorir</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
     <style>
         /* ─── TOKENS ─────────────────────────────────────────── */
@@ -449,6 +449,221 @@
         }
         .whatsapp-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
 
+        /* ─── AJUSTE 1: BLOCO DE CHECKOUT (2 PLANOS + FORMULÁRIO) ─── */
+        #checkout-block {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 30px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(18px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.9s ease;
+        }
+        #checkout-block.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 3000px;
+        }
+        .checkout-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.5rem, 4.5vw, 2.1rem);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        /* ── Formulário (compartilhado pelos 2 planos) ── */
+        .checkout-form {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .checkout-form label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.78rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+        .checkout-field { width: 100%; }
+        .checkout-field input {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 13px 14px;
+            color: var(--text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .checkout-field input:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px var(--red-dim);
+        }
+        .checkout-field input.field-invalid {
+            border-color: #ff4444;
+        }
+        .checkout-field small.field-error {
+            display: none;
+            color: #ff6b6b;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+        .checkout-field input.field-invalid ~ small.field-error { display: block; }
+
+        /* ── Cards dos planos ── */
+        .plans-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .plan-card {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 26px 20px 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .plan-card.premium {
+            border-color: var(--red);
+            box-shadow: 0 0 0 1px var(--red-dim), 0 0 40px var(--red-dim);
+        }
+        .plan-tag {
+            position: absolute;
+            top: -13px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--red);
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px var(--red-glow);
+            white-space: nowrap;
+        }
+        .plan-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .plan-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 10px 0 4px;
+        }
+        .plan-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.6rem;
+            line-height: 1;
+        }
+        .plan-badge-discount {
+            background: var(--red-dim);
+            color: var(--red);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.68rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .plan-benefits {
+            list-style: none;
+            width: 100%;
+            margin: 16px 0 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .plan-benefits li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.85);
+            text-align: left;
+        }
+        .plan-benefits li svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--red);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .plan-buy-btn {
+            width: 100%;
+            padding: 15px 12px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .plan-buy-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .plan-buy-btn:not(:disabled):hover { transform: translateY(-2px); }
+        .plan-buy-btn.basic-btn {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .plan-buy-btn.premium-btn {
+            background: linear-gradient(135deg, #c40812 0%, var(--red) 50%, #ff2a2a 100%);
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(229,9,20,0.3), 0 0 30px var(--red-dim);
+        }
+        .checkout-status {
+            margin-top: 14px;
+            text-align: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.82rem;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            min-height: 18px;
+        }
+
+        @media (max-width: 640px) {
+            .plans-grid { grid-template-columns: 1fr; }
+            .plan-card.premium { order: -1; } /* Premium aparece primeiro no mobile */
+        }
+
         /* ─── ANIMATIONS ─────────────────────────────────────── */
         @keyframes pulse-icon {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -481,7 +696,7 @@
 
     <!-- Headline -->
     <h1 class="headline">
-        COMO TER TODOS JOGOS<br>DA STEAM <em>DE GRAÇA</em>
+        CAPAS DE JOGOS DA STEAM<br>PARA <em>COLORIR</em>
     </h1>
 
     <!-- Video Card -->
@@ -527,6 +742,71 @@
 
     </div><!-- /.video-card -->
 
+    <!-- AJUSTE 1: Bloco de checkout — só aparece quando o vídeo termina -->
+    <div id="checkout-block">
+        <h2 class="checkout-title">Escolha seu acesso premium</h2>
+
+        <!-- Formulário (usado pelos 2 planos) -->
+        <form class="checkout-form" id="checkoutForm" autocomplete="off">
+            <div class="checkout-field">
+                <label for="fullName">Nome completo</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Seu nome completo" required>
+                <small class="field-error">Preencha seu nome completo</small>
+            </div>
+            <div class="checkout-field">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                <small class="field-error">Digite um e-mail válido</small>
+            </div>
+            <div class="checkout-field">
+                <label for="whatsapp">WhatsApp com DDD</label>
+                <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 99999-9999" maxlength="15" required>
+                <small class="field-error">Digite um WhatsApp válido com DDD</small>
+            </div>
+        </form>
+
+        <!-- 2 planos lado a lado (desktop) / empilhados (mobile) -->
+        <div class="plans-grid">
+
+            <!-- PLANO BÁSICO -->
+            <div class="plan-card basic">
+                <div class="plan-name">Plano Básico</div>
+                <div class="plan-price-row">
+                    <span class="plan-price">R$89</span>
+                </div>
+                <ul class="plan-benefits">
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> Acesso Completo Conta Steam Premium</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> Liberação Imediata</li>
+                </ul>
+                <button type="button" class="plan-buy-btn basic-btn" id="buyBasicBtn" disabled data-plan="basic" data-price="89">
+                    COMPRAR BÁSICO R$89
+                </button>
+            </div>
+
+            <!-- PLANO PREMIUM -->
+            <div class="plan-card premium">
+                <span class="plan-tag">Mais vendido</span>
+                <div class="plan-name">Plano Premium</div>
+                <div class="plan-price-row">
+                    <span class="plan-price">R$149</span>
+                    <span class="plan-badge-discount">Economize 40%</span>
+                </div>
+                <ul class="plan-benefits">
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> Tudo do Básico</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> + Suporte Prioritário 24h no WhatsApp</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> + Bônus: 10 Jogos Extras Liberados</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> + Garantia de 30 Dias</li>
+                </ul>
+                <button type="button" class="plan-buy-btn premium-btn" id="buyPremiumBtn" disabled data-plan="premium" data-price="149">
+                    COMPRAR PREMIUM R$149
+                </button>
+            </div>
+
+        </div><!-- /.plans-grid -->
+
+        <div class="checkout-status" id="checkoutStatus"></div>
+    </div><!-- /#checkout-block -->
+
     <!-- CTA — appears at 4:43, logo abaixo do vídeo -->
     <div id="cta-wrap">
         <!--
@@ -543,23 +823,19 @@
         </a>
     </div>
 
-    <!-- AJUSTE 2: Carrossel de prova social — mesma largura do vídeo — visível desde o início -->
-    <div id="social-proof-wrap" class="visible">
+    <!-- AJUSTE 3: Carrossel de prova social — mesma largura do vídeo — aparece junto com o checkout -->
+    <div id="social-proof-wrap">
         <div class="carousel-outer">
             <div class="carousel-track" id="carouselTrack">
-                <!--
-                    ┌──────────────────────────────────────────────────────────┐
-                    │  Para colocar suas imagens, troque o background-image    │
-                    │  de cada slide abaixo por:                                │
-                    │  style="background-image:url('SUA_IMAGEM.jpg')"          │
-                    └──────────────────────────────────────────────────────────┘
-                -->
-          <div class="carousel-slide" style="background-image:url('https://image.api.playstation.com/vulcan/ap/rnd/202009/3021/BtsjAgHT9pqHRXtN9FCk7xc8.png')"></div>
-                <div class="carousel-slide" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzpIKomqEzovS4bMxKCiDqu4kGQ0yLhJmEhA0n-e-ZGQs-O3ytCh8oSjh8&s=10')"></div>
-                <div class="carousel-slide" style="background-image:url('https://store-images.s-microsoft.com/image/apps.65104.14157056169306105.30ae0432-c36b-42e7-9bbb-f85189243ca3.8e302653-b1b3-4ef9-b328-6a0822123e0c')"></div>
+                <!-- IMAGEM PROVA SOCIAL 1 -->
+                <div class="carousel-slide"></div>
+                <!-- IMAGEM PROVA SOCIAL 2 -->
+                <div class="carousel-slide"></div>
+                <!-- IMAGEM PROVA SOCIAL 3 -->
+                <div class="carousel-slide"></div>
             </div>
         </div>
-    </div
+    </div>
     <!-- Botão de WhatsApp — abaixo do carrossel -->
     <div id="whatsapp-wrap">
         <!--
@@ -587,7 +863,7 @@
        ═══════════════════════════════════════════════════════════ */
     const VIDEO_ID    = 'dL2QHhxPSlY';          // ← ID do vídeo do YouTube
     const REDIRECT    = 'https://wa.me/message/SA53EQAF7RTVH1/'; // ← URL de destino
-    const CTA_SECOND  = 30;                     // 4 min 43 s  (não altere)
+    const CTA_SECOND  = 15;                     // 4 min 43 s  (não altere)
     /* ═══════════════════════════════════════════════════════════ */
 
     let player;
@@ -654,7 +930,27 @@
         if (e.data === YT.PlayerState.ENDED) {
             videoEnded = true;
             if (ctaShown) exitFakeFullscreen();
+            unlockCheckout();
         }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 1 — Libera o bloco de checkout quando o vídeo termina
+       ═══════════════════════════════════════════════════════════ */
+    let checkoutUnlocked = false;
+
+    function unlockCheckout() {
+        if (checkoutUnlocked) return;
+        checkoutUnlocked = true;
+
+        const block = document.getElementById('checkout-block');
+        const social = document.getElementById('social-proof-wrap');
+        block.classList.add('visible');
+        social.classList.add('visible');
+
+        setTimeout(() => {
+            block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
     }
 
     /* ── User clicks overlay → unmute & start experience ── */
@@ -824,6 +1120,181 @@
 
         /* Touch já funciona nativamente via overflow-x + scroll-snap */
     })();
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 1 — Formulário: máscara de WhatsApp + validação
+       ═══════════════════════════════════════════════════════════ */
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput    = document.getElementById('email');
+    const whatsappInput = document.getElementById('whatsapp');
+    const buyBasicBtn   = document.getElementById('buyBasicBtn');
+    const buyPremiumBtn = document.getElementById('buyPremiumBtn');
+    const checkoutStatus = document.getElementById('checkoutStatus');
+
+    /* Máscara (11) 99999-9999 */
+    whatsappInput.addEventListener('input', () => {
+        let v = whatsappInput.value.replace(/\D/g, '').slice(0, 11);
+        if (v.length > 6) {
+            v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+        } else if (v.length > 2) {
+            v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+        } else if (v.length > 0) {
+            v = `(${v}`;
+        }
+        whatsappInput.value = v;
+        validateCheckoutForm();
+    });
+
+    fullNameInput.addEventListener('input', validateCheckoutForm);
+    emailInput.addEventListener('input', validateCheckoutForm);
+
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validateCheckoutForm() {
+        const nameOk  = fullNameInput.value.trim().length >= 3;
+        const emailOk = isValidEmail(emailInput.value.trim());
+        const waDigits = whatsappInput.value.replace(/\D/g, '');
+        const waOk    = waDigits.length === 10 || waDigits.length === 11;
+
+        fullNameInput.classList.toggle('field-invalid', fullNameInput.value.length > 0 && !nameOk);
+        emailInput.classList.toggle('field-invalid', emailInput.value.length > 0 && !emailOk);
+        whatsappInput.classList.toggle('field-invalid', whatsappInput.value.length > 0 && !waOk);
+
+        const allOk = nameOk && emailOk && waOk;
+        buyBasicBtn.disabled   = !allOk;
+        buyPremiumBtn.disabled = !allOk;
+        return allOk;
+    }
+
+    function getBuyerData() {
+        return {
+            name: fullNameInput.value.trim(),
+            email: emailInput.value.trim(),
+            whatsapp: whatsappInput.value.replace(/\D/g, '')
+        };
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 1 — Integração Mercado Pago (Checkout Transparente)
+       ═══════════════════════════════════════════════════════════
+       Requer o SDK oficial do Mercado Pago carregado na página:
+       <script src="https://sdk.mercadopago.com/js/v2"></script>
+       (adicione essa tag no <head>, junto às outras fontes/scripts)
+    ═══════════════════════════════════════════════════════════ */
+
+    // COLE AQUI SEU ACCESS_TOKEN E PUBLIC_KEY DO MERCADO PAGO
+    const MP_PUBLIC_KEY = 'SUA_PUBLIC_KEY_AQUI'; // ← usada no front-end (segura de expor)
+    // O ACCESS_TOKEN NUNCA deve ficar no front-end. Ele fica apenas no seu backend,
+    // que é quem efetivamente cria o pagamento na API do Mercado Pago.
+    // Ex.: process.env.MP_ACCESS_TOKEN no servidor (Node/PHP/Python etc.)
+
+    let mpInstance = null;
+    if (window.MercadoPago) {
+        mpInstance = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+    }
+
+    async function startCheckout(plan, price) {
+        if (!validateCheckoutForm()) {
+            checkoutStatus.textContent = 'Preencha todos os campos corretamente.';
+            return;
+        }
+
+        const buyer = getBuyerData();
+        buyBasicBtn.disabled = true;
+        buyPremiumBtn.disabled = true;
+        checkoutStatus.textContent = 'Gerando pagamento...';
+
+        try {
+            /* ── 1) Seu backend cria a "preference"/pagamento no Mercado Pago
+                     usando o ACCESS_TOKEN (nunca no front-end) e retorna os
+                     dados necessários para o Checkout Transparente (ex.: um
+                     init_point, ou os dados do QR Pix / cartão). ──
+                Endpoint de exemplo — troque pela sua rota real: */
+            const response = await fetch('/api/criar-pagamento', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    plano: plan,
+                    valor: price,
+                    comprador: buyer
+                })
+            });
+
+            const data = await response.json();
+
+            /* ── 2) Aqui você trata o retorno conforme o método escolhido
+                     (Pix, cartão via Payment Brick/CardForm do SDK MP, etc.)
+                     Este é só um placeholder de fluxo. ── */
+            checkoutStatus.textContent = 'Pagamento gerado! Finalize no Mercado Pago.';
+
+            /* ── 3) IMPORTANTE: a confirmação real de pagamento "approved"
+                     deve vir de um WEBHOOK no seu backend (o Mercado Pago
+                     notifica seu servidor), e não do retorno direto no
+                     navegador — isso evita que alguém finja um pagamento
+                     aprovado sem realmente pagar. O backend, ao receber o
+                     webhook com status "approved", deve chamar a rota que
+                     dispara a mensagem de WhatsApp (ver AJUSTE 4 abaixo). ── */
+
+            // Exemplo apenas para fins de demonstração do fluxo em tela:
+            if (data && data.status === 'approved') {
+                onPaymentApproved(buyer, plan);
+            }
+
+        } catch (err) {
+            console.error('Erro ao gerar pagamento:', err);
+            checkoutStatus.textContent = 'Erro ao gerar pagamento. Tente novamente.';
+        } finally {
+            validateCheckoutForm();
+        }
+    }
+
+    buyBasicBtn.addEventListener('click', () => startCheckout('Plano Básico', 89));
+    buyPremiumBtn.addEventListener('click', () => startCheckout('Plano Premium', 149));
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 4 — Envio automático de WhatsApp após pagamento aprovado
+       ═══════════════════════════════════════════════════════════
+       O ideal é que esta chamada aconteça no BACKEND, disparada pelo
+       webhook do Mercado Pago (não pelo navegador do cliente) — assim
+       ninguém consegue forjar um "pagamento aprovado" fake e receber
+       a mensagem de acesso sem pagar de verdade.
+       A função abaixo mostra o formato da chamada e fica disponível
+       para ser reaproveitada no seu servidor (Node/PHP/Python etc.).
+    ═══════════════════════════════════════════════════════════ */
+
+    // CONFIGURAR AQUI: TOKEN DA API DE WHATSAPP. Sugestão: Evolution API, Z-API ou UltraMSG
+    const WHATSAPP_API_URL   = 'https://SUA-INSTANCIA-AQUI/api/enviar-mensagem'; // ← endpoint da sua API de WhatsApp
+    const WHATSAPP_API_TOKEN = 'SEU_TOKEN_AQUI'; // ← token/instance key da Evolution API, Z-API ou UltraMSG
+
+    async function onPaymentApproved(buyer, plan) {
+        checkoutStatus.textContent = 'Pagamento aprovado! Enviando seu acesso no WhatsApp...';
+
+        const mensagem =
+            `Olá ${buyer.name}! 🚀\n` +
+            `Seu pagamento do ${plan} foi aprovado!\n` +
+            `Aqui está seu acesso: [LINK DA CONTA STEAM]\n` +
+            `Qualquer dúvida chama a gente aqui. Bom jogo!`;
+
+        try {
+            await fetch(WHATSAPP_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${WHATSAPP_API_TOKEN}` // ajuste o header conforme a API escolhida
+                },
+                body: JSON.stringify({
+                    numero: buyer.whatsapp,
+                    mensagem: mensagem
+                })
+            });
+            checkoutStatus.textContent = 'Acesso enviado no seu WhatsApp!';
+        } catch (err) {
+            console.error('Erro ao enviar WhatsApp:', err);
+            checkoutStatus.textContent = 'Pagamento aprovado, mas houve um erro ao enviar o WhatsApp. Entraremos em contato.';
+        }
+    }
 
     /* ── Prevent right-click context menu on the video area ── */
     document.addEventListener('contextmenu', e => {
