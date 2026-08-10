@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -689,7 +690,7 @@
                 </button>
                 <button type="button" class="vc-btn" id="btnSpeed" aria-label="Velocidade">1x</button>
                 <button type="button" class="vc-btn" id="btnFullscreen" aria-label="Tela cheia">
-                    <svg id="iconFullscreen" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    <svg id="iconFullscreen" vie~wJ7N"0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                 </button>
             </div>
         </div>
@@ -723,40 +724,39 @@
 
         <div class="plans-grid">
 
-            <!-- PLANO R$ 89 -->
+            <!-- PLANO OFF -->
             <div class="plan-card">
-                <div class="plan-name">PLANO R$ 89</div>
-                <div class="plan-price">R$ 89</div>
+                <div class="plan-name">PLANO OFF</div>
+                <div class="plan-price">R$ 99</div>
                 <ul class="plan-benefits">
                     <!-- Benefícios editáveis — troque o texto de cada linha abaixo -->
-                    <li>BENEFÍCIO EDITÁVEL 01</li>
-                    <li>BENEFÍCIO EDITÁVEL 02</li>
-                    <li>BENEFÍCIO EDITÁVEL 03</li>
-                    <li>BENEFÍCIO EDITÁVEL 04</li>
-                    <li>BENEFÍCIO EDITÁVEL 05</li>
-                    <li>BENEFÍCIO EDITÁVEL 06</li>
+                    <li>Acesso a todos jogos da steam</li>
+                    <li>Plano vitalicio</li>
+                    <li>Garantia de reembolso 7 dias</li>
+                   
+                  
+                   
                 </ul>
                 <!-- O link deste botão é preenchido automaticamente pelo PLAN_CONFIG no script -->
-                <a href="#" class="plan-btn" id="planBtn89" data-plan="plano89" target="_blank" rel="noopener">
+                <a href="#" class="plan-btn" id="planBtn99" data-plan="plano99" target="_blank" rel="noopener">
                     QUERO ESTE PLANO
                 </a>
             </div>
 
-            <!-- PLANO R$ 149 -->
+            <!-- PLANO ON -->
             <div class="plan-card plan-card--featured">
                 <!-- Texto do selo editável -->
                 <div class="plan-badge">MAIS VANTAGENS</div>
-                <div class="plan-name">PLANO R$ 149</div>
+                <div class="plan-name">PLANO ON</div>
                 <div class="plan-price">R$ 149</div>
                 <ul class="plan-benefits">
                     <!-- Benefícios editáveis — troque o texto de cada linha abaixo -->
-                    <li>BENEFÍCIO EDITÁVEL 01</li>
-                    <li>BENEFÍCIO EDITÁVEL 02</li>
-                    <li>BENEFÍCIO EDITÁVEL 03</li>
-                    <li>BENEFÍCIO EDITÁVEL 04</li>
-                    <li>BENEFÍCIO EDITÁVEL 05</li>
-                    <li>BENEFÍCIO EDITÁVEL 06</li>
-                    <li>BENEFÍCIO EDITÁVEL 07</li>
+                    <li>Acesso a todos jogos da steam</li>
+                    <li>MODO ONLINE ATIVO</li>
+                    <li>MULTIPLAYER</li>
+                    <li>Garantia de reembolso 7 dias</li>
+                    <li>Acesso vitalício</li>
+                    <li>Suporte 24h</li>
                 </ul>
                 <!-- O link deste botão é preenchido automaticamente pelo PLAN_CONFIG no script -->
                 <a href="#" class="plan-btn" id="planBtn149" data-plan="plano149" target="_blank" rel="noopener">
@@ -829,7 +829,7 @@
        ═══════════════════════════════════════════════════════════ */
     const VIDEO_ID    = 'dL2QHhxPSlY';          // ← ID do vídeo do YouTube
     const REDIRECT    = 'https://wa.me/message/SA53EQAF7RTVH1/'; // ← URL de destino
-    const CTA_SECOND  = 30;                     // 4 min 43 s  (não altere)
+    const CTA_SECOND  = 5;                     // 4 min 43 s  (não altere)
     /* ═══════════════════════════════════════════════════════════ */
 
     /* ═══════════════════════════════════════════════════════════
@@ -838,8 +838,8 @@
        ═══════════════════════════════════════════════════════════ */
     const PLAN_CONFIG = {
         whatsappNumber: '5553981021909', // ← DDI + DDD + número, sem espaços/símbolos
-        plano89: {
-            mensagem: 'Quero fazer o pagamento deste plano de R$ 89'
+        plano99: {
+            mensagem: 'Quero fazer o pagamento deste plano de R$ 99'
         },
         plano149: {
             mensagem: 'Quero fazer o pagamento deste plano de R$ 149'
