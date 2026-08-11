@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -563,7 +564,7 @@
         .carousel-slide {
             flex: 0 0 78%;
             max-width: 320px;
-            aspect-ratio: 4 / 8;
+            aspect-ratio: 4 / 5;
             scroll-snap-align: center;
             border-radius: 10px;
             border: 1px solid var(--border);
@@ -658,238 +659,6 @@
     .logo { font-size: 1.6rem; margin-bottom: 22px; }
     .video-card { border-radius: 6px; }
     .plan-price { font-size: 2rem; }
-        }
-
-        /* ═══════════════════════════════════════════════════════════
-           POPUP DE CHECKOUT
-           ═══════════════════════════════════════════════════════════ */
-        .checkout-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100000;
-            background: rgba(0,0,0,0.86);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-        .checkout-overlay.active { display: flex; }
-        .checkout-overlay.show { opacity: 1; }
-
-        .checkout-modal {
-            width: 100%;
-            max-width: 440px;
-            max-height: 92vh;
-            overflow-y: auto;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.03),
-                0 20px 80px rgba(0,0,0,0.85),
-                0 0 90px var(--red-dim);
-            padding: 30px 24px 26px;
-            position: relative;
-            transform: translateY(18px) scale(0.98);
-            transition: transform 0.3s ease;
-        }
-        .checkout-overlay.show .checkout-modal { transform: translateY(0) scale(1); }
-
-        .checkout-close {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: rgba(255,255,255,0.04);
-            color: var(--muted);
-            font-size: 1.05rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background .2s ease, color .2s ease;
-        }
-        .checkout-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-        .checkout-header { margin-bottom: 22px; text-align: center; }
-        .checkout-eyebrow {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.76rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 6px;
-        }
-        .checkout-plan-name {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.5rem;
-            letter-spacing: 0.05em;
-            color: var(--text);
-        }
-        .checkout-plan-price {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 900;
-            font-size: 2.1rem;
-            color: var(--red);
-            text-shadow: 0 0 24px var(--red-glow);
-            margin-top: 2px;
-        }
-
-        .checkout-error {
-            display: none;
-            background: rgba(229,9,20,0.1);
-            border: 1px solid rgba(229,9,20,0.4);
-            color: #ff9498;
-            font-size: 0.82rem;
-            line-height: 1.4;
-            padding: 10px 12px;
-            border-radius: 7px;
-            margin-bottom: 14px;
-        }
-        .checkout-error.show { display: block; }
-
-        .checkout-field { margin-bottom: 16px; }
-        .checkout-label {
-            display: block;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 7px;
-        }
-        .checkout-input {
-            width: 100%;
-            padding: 13px 14px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-family: 'Barlow', sans-serif;
-            font-size: 0.95rem;
-            outline: none;
-            transition: border-color .2s ease, background .2s ease;
-        }
-        .checkout-input::placeholder { color: rgba(255,255,255,0.28); }
-        .checkout-input:focus { border-color: var(--red); background: rgba(255,255,255,0.06); }
-
-        .checkout-pay-toggle { display: flex; gap: 10px; margin-bottom: 18px; }
-        .pay-option {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 13px 10px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: rgba(255,255,255,0.03);
-            color: var(--muted);
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.92rem;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all .2s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .pay-option svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
-        .pay-option.active {
-            border-color: var(--red);
-            color: #fff;
-            background: var(--red-dim);
-            box-shadow: 0 0 20px var(--red-dim);
-        }
-
-        .pay-panel { display: none; }
-        .pay-panel.active { display: block; }
-
-        .pix-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px dashed rgba(255,255,255,0.18);
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-        .pix-code {
-            font-family: 'Courier New', monospace;
-            font-size: 0.76rem;
-            color: rgba(255,255,255,0.75);
-            word-break: break-all;
-            line-height: 1.5;
-            max-height: 90px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-        }
-        .pix-copy-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 7px;
-            background: linear-gradient(135deg, #1b8a3d 0%, #25d366 55%, #34e37a 100%);
-            color: #fff;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: transform .2s ease, box-shadow .2s ease;
-        }
-        .pix-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 0 24px rgba(37,211,102,0.4); }
-        .pix-copy-btn.copied { background: linear-gradient(135deg, #0e5c26 0%, #1b8a3d 100%); }
-        .pix-note { font-size: 0.78rem; color: var(--muted); text-align: center; line-height: 1.4; }
-
-        .card-row { display: flex; gap: 12px; }
-        .card-row .checkout-field { flex: 1; }
-
-        .checkout-submit {
-            width: 100%;
-            padding: 16px;
-            margin-top: 6px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--red) 0%, #ff2b3a 100%);
-            color: #fff;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 900;
-            font-size: 1.05rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 0 0 2px var(--red-dim), 0 0 30px var(--red-glow);
-            transition: transform .2s ease, box-shadow .2s ease;
-        }
-        .checkout-submit:hover { transform: translateY(-2px); box-shadow: 0 0 0 2px var(--red-dim), 0 0 44px var(--red-glow); }
-        .checkout-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-
-        .checkout-secure {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 14px;
-            font-size: 0.76rem;
-            color: var(--muted);
-        }
-
-        @media (max-width: 480px) {
-            .checkout-modal { padding: 26px 18px 22px; }
-            .card-row { flex-direction: column; gap: 0; }
 }
     </style>
 </head>
@@ -1017,7 +786,7 @@
                     └──────────────────────────────────────────────────────────┘
                 -->
           <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413650/IMG_2721_deiixe.png)"></div>
-                <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786415810/IMG_2728_krgufa.png)"></div>
+                <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413649/IMG_2728_gctwri.png)"></div>
                 <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413661/IMG_2729_ijwc0b.png)"></div>
                 <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413646/IMG_2737_beub9l.jpg)"></div>
             </div>
@@ -1058,78 +827,6 @@
 
 </div><!-- /.page -->
 
-<!-- ═══════════════════════════════════════════════════════════
-     POPUP DE CHECKOUT
-     ═══════════════════════════════════════════════════════════ -->
-<div class="checkout-overlay" id="checkoutOverlay">
-    <div class="checkout-modal" onclick="event.stopPropagation()">
-        <button type="button" class="checkout-close" id="checkoutClose" aria-label="Fechar">✕</button>
-
-        <div class="checkout-header">
-            <div class="checkout-eyebrow">Finalizar assinatura</div>
-            <div class="checkout-plan-name" id="checkoutPlanName">—</div>
-            <div class="checkout-plan-price" id="checkoutPlanPrice">R$ 0</div>
-        </div>
-
-        <div class="checkout-error" id="checkoutError"></div>
-
-        <div class="checkout-field">
-            <label class="checkout-label" for="checkoutNome">Nome completo</label>
-            <input type="text" id="checkoutNome" class="checkout-input" placeholder="Digite seu nome">
-        </div>
-
-        <div class="checkout-field">
-            <label class="checkout-label" for="checkoutWhats">WhatsApp</label>
-            <input type="tel" id="checkoutWhats" class="checkout-input" placeholder="(00) 00000-0000">
-        </div>
-
-        <div class="checkout-field">
-            <label class="checkout-label">Forma de pagamento</label>
-            <div class="checkout-pay-toggle">
-                <div class="pay-option" id="payOptionPix" onclick="selectPaymentMethod('pix')">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.32 2.5a3.6 3.6 0 0 1 2.55 1.06l3.4 3.4a1.2 1.2 0 0 0 .85.35h.6a3.6 3.6 0 0 1 2.55 1.06l1.13 1.13a3.6 3.6 0 0 1 0 5.1l-1.13 1.13a3.6 3.6 0 0 1-2.55 1.06h-.6a1.2 1.2 0 0 0-.85.35l-3.4 3.4a3.6 3.6 0 0 1-5.1 0l-3.4-3.4a1.2 1.2 0 0 0-.85-.35h-.6a3.6 3.6 0 0 1-2.55-1.06L.24 14.6a3.6 3.6 0 0 1 0-5.1l1.13-1.13A3.6 3.6 0 0 1 3.92 7.3h.6c.32 0 .62-.13.85-.35l3.4-3.4A3.6 3.6 0 0 1 11.32 2.5z"/></svg>
-                    Pix
-                </div>
-                <div class="pay-option" id="payOptionCard" onclick="selectPaymentMethod('cartao')">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2m0 14H4v-6h16zm0-10H4V6h16z"/></svg>
-                    Cartão
-                </div>
-            </div>
-        </div>
-
-        <!-- PIX -->
-        <div class="pay-panel" id="panelPix">
-            <div class="pix-box">
-                <div class="pix-code" id="pixCode">Selecione Pix para gerar o código…</div>
-                <button type="button" class="pix-copy-btn" id="pixCopyBtn" onclick="copyPixCode()">Copiar código Pix</button>
-            </div>
-            <p class="pix-note">Copie o código acima e cole no app do seu banco para efetuar o pagamento. Após a confirmação, seu acesso é liberado.</p>
-        </div>
-
-        <!-- CARTÃO -->
-        <div class="pay-panel" id="panelCard">
-            <div class="checkout-field">
-                <label class="checkout-label" for="cardNumero">Número do cartão</label>
-                <input type="text" id="cardNumero" class="checkout-input" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric">
-            </div>
-            <div class="card-row">
-                <div class="checkout-field">
-                    <label class="checkout-label" for="cardValidade">Validade</label>
-                    <input type="text" id="cardValidade" class="checkout-input" placeholder="MM/AA" maxlength="5" inputmode="numeric">
-                </div>
-                <div class="checkout-field">
-                    <label class="checkout-label" for="cardCvv">CVV</label>
-                    <input type="text" id="cardCvv" class="checkout-input" placeholder="000" maxlength="4" inputmode="numeric">
-                </div>
-            </div>
-        </div>
-
-        <button type="button" class="checkout-submit" id="checkoutSubmitBtn" onclick="finalizarCompra()">Finalizar Compra</button>
-
-        <div class="checkout-secure">🔒 Ambiente seguro — seus dados estão protegidos</div>
-    </div>
-</div>
-
 <!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
@@ -1138,7 +835,7 @@
        ═══════════════════════════════════════════════════════════ */
     const VIDEO_ID    = 'dL2QHhxPSlY';          // ← ID do vídeo do YouTube
     const REDIRECT    = 'https://wa.me/message/SA53EQAF7RTVH1/'; // ← URL de destino
-    const CTA_SECOND  = 11;                     // 4 min 43 s  (não altere)
+    const CTA_SECOND  = 5;                     // 4 min 43 s  (não altere)
     /* ═══════════════════════════════════════════════════════════ */
 
     /* ═══════════════════════════════════════════════════════════
@@ -1146,211 +843,23 @@
        e a mensagem enviada por cada botão de plano
        ═══════════════════════════════════════════════════════════ */
     const PLAN_CONFIG = {
-        whatsappNumber: '5553981021909', // ← DDI + DDD + número, sem espaços/símbolos (não usado mais pelos botões dos planos, mantido para referência)
+        whatsappNumber: '5553981021909', // ← DDI + DDD + número, sem espaços/símbolos
         plano99: {
-            nome: 'MODO HISTORIA',
-            preco: 'R$ 99',
-            mensagem: 'Quero fazer o pagamento do plano MODO HISTORIA'
+            mensagem: 'Quero fazer o pagamento deste plano de R$ 99'
         },
         plano149: {
-            nome: 'MODO MULTIPLAYER',
-            preco: 'R$ 149',
-            mensagem: 'Quero fazer o pagamento do plano MODO MULTIPLAYER'
+            mensagem: 'Quero fazer o pagamento deste plano de R$ 149'
         }
     };
 
-    /* Os botões dos planos agora abrem o pop-up de checkout em vez de ir direto pro WhatsApp */
-    function attachPlanButtons() {
+    function applyPlanLinks() {
         document.querySelectorAll('.plan-btn[data-plan]').forEach((btn) => {
-            btn.removeAttribute('href');
-            btn.removeAttribute('target');
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                openCheckout(btn.getAttribute('data-plan'));
-            });
+            const cfg = PLAN_CONFIG[btn.getAttribute('data-plan')];
+            if (!cfg) return;
+            btn.href = 'https://wa.me/' + PLAN_CONFIG.whatsappNumber + '?text=' + encodeURIComponent(cfg.mensagem);
         });
     }
-    attachPlanButtons();
-    /* ═══════════════════════════════════════════════════════════ */
-
-    /* ═══════════════════════════════════════════════════════════
-       POPUP DE CHECKOUT
-       ═══════════════════════════════════════════════════════════ */
-    let currentCheckoutPlan   = null;
-    let selectedPaymentMethod = null;
-    let pixCodeGenerated      = false;
-
-    function openCheckout(planKey) {
-        const cfg = PLAN_CONFIG[planKey];
-        if (!cfg) return;
-        currentCheckoutPlan = planKey;
-
-        document.getElementById('checkoutPlanName').textContent  = cfg.nome;
-        document.getElementById('checkoutPlanPrice').textContent = cfg.preco;
-
-        /* reseta o formulário toda vez que abre */
-        document.getElementById('checkoutNome').value    = '';
-        document.getElementById('checkoutWhats').value   = '';
-        document.getElementById('cardNumero').value      = '';
-        document.getElementById('cardValidade').value    = '';
-        document.getElementById('cardCvv').value         = '';
-        hideCheckoutError();
-
-        selectedPaymentMethod = null;
-        pixCodeGenerated = false;
-        document.getElementById('pixCode').textContent = 'Selecione Pix para gerar o código…';
-        document.getElementById('payOptionPix').classList.remove('active');
-        document.getElementById('payOptionCard').classList.remove('active');
-        document.getElementById('panelPix').classList.remove('active');
-        document.getElementById('panelCard').classList.remove('active');
-        document.getElementById('pixCopyBtn').classList.remove('copied');
-        document.getElementById('pixCopyBtn').textContent = 'Copiar código Pix';
-
-        const submitBtn = document.getElementById('checkoutSubmitBtn');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Finalizar Compra';
-
-        const overlay = document.getElementById('checkoutOverlay');
-        overlay.classList.add('active');
-        requestAnimationFrame(() => overlay.classList.add('show'));
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeCheckout() {
-        const overlay = document.getElementById('checkoutOverlay');
-        overlay.classList.remove('show');
-        document.body.style.overflow = '';
-        setTimeout(() => overlay.classList.remove('active'), 250);
-    }
-
-    document.getElementById('checkoutOverlay').addEventListener('click', closeCheckout);
-    document.getElementById('checkoutClose').addEventListener('click', closeCheckout);
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeCheckout();
-    });
-
-    function selectPaymentMethod(method) {
-        selectedPaymentMethod = method;
-        document.getElementById('payOptionPix').classList.toggle('active', method === 'pix');
-        document.getElementById('payOptionCard').classList.toggle('active', method === 'cartao');
-        document.getElementById('panelPix').classList.toggle('active', method === 'pix');
-        document.getElementById('panelCard').classList.toggle('active', method === 'cartao');
-
-        if (method === 'pix' && !pixCodeGenerated) generatePixCode();
-    }
-
-    /* Gera um código Pix "copia e cola" simulado — quando o Mercado Pago
-       estiver conectado, este trecho será substituído pelo código real
-       retornado pela API. */
-    function generatePixCode() {
-        const cfg   = PLAN_CONFIG[currentCheckoutPlan];
-        const valor = cfg ? cfg.preco.replace('R$', '').trim() : '00';
-        const rnd   = () => Math.random().toString(36).substring(2, 10).toUpperCase();
-        const codigo = '00020126360014BR.GOV.BCB.PIX0114' + rnd() +
-            '5204000053039865406' + valor + '005802BR5913STEAM' +
-            'PREMIUM6009SAO PAULO62070503***6304' + rnd().substring(0, 4);
-        document.getElementById('pixCode').textContent = codigo;
-        pixCodeGenerated = true;
-    }
-
-    function copyPixCode() {
-        const code = document.getElementById('pixCode').textContent;
-        const btn  = document.getElementById('pixCopyBtn');
-
-        const markCopied = () => {
-            btn.textContent = 'Código copiado ✓';
-            btn.classList.add('copied');
-            setTimeout(() => {
-                btn.textContent = 'Copiar código Pix';
-                btn.classList.remove('copied');
-            }, 2500);
-        };
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(code).then(markCopied).catch(() => fallbackCopy(code, markCopied));
-        } else {
-            fallbackCopy(code, markCopied);
-        }
-    }
-
-    function fallbackCopy(text, cb) {
-        const temp = document.createElement('textarea');
-        temp.value = text;
-        temp.style.position = 'fixed';
-        temp.style.opacity = '0';
-        document.body.appendChild(temp);
-        temp.select();
-        try { document.execCommand('copy'); } catch(_) {}
-        document.body.removeChild(temp);
-        cb();
-    }
-
-    function showCheckoutError(msg) {
-        const box = document.getElementById('checkoutError');
-        box.textContent = msg;
-        box.classList.add('show');
-    }
-    function hideCheckoutError() {
-        document.getElementById('checkoutError').classList.remove('show');
-    }
-
-    /* Máscaras simples dos campos */
-    document.getElementById('checkoutWhats').addEventListener('input', (e) => {
-        let v = e.target.value.replace(/\D/g, '').substring(0, 11);
-        if (v.length > 6) v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7)}`;
-        else if (v.length > 2) v = `(${v.substring(0,2)}) ${v.substring(2)}`;
-        e.target.value = v;
-    });
-    document.getElementById('cardNumero').addEventListener('input', (e) => {
-        let v = e.target.value.replace(/\D/g, '').substring(0, 16);
-        e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
-    });
-    document.getElementById('cardValidade').addEventListener('input', (e) => {
-        let v = e.target.value.replace(/\D/g, '').substring(0, 4);
-        if (v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
-        e.target.value = v;
-    });
-    document.getElementById('cardCvv').addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-    });
-
-    /* Botão "Finalizar Compra" — ainda NÃO conectado ao Mercado Pago.
-       Aqui é só a validação e o layout do fluxo. Quando a integração
-       for feita, este é o lugar onde entra a chamada para gerar o
-       pagamento de verdade. */
-    function finalizarCompra() {
-        hideCheckoutError();
-        const nome  = document.getElementById('checkoutNome').value.trim();
-        const whats = document.getElementById('checkoutWhats').value.trim();
-
-        if (!nome) return showCheckoutError('Preencha seu nome.');
-        if (whats.replace(/\D/g, '').length < 10) return showCheckoutError('Informe um WhatsApp válido.');
-        if (!selectedPaymentMethod) return showCheckoutError('Escolha uma forma de pagamento.');
-
-        if (selectedPaymentMethod === 'cartao') {
-            const num = document.getElementById('cardNumero').value.replace(/\D/g, '');
-            const val = document.getElementById('cardValidade').value;
-            const cvv = document.getElementById('cardCvv').value;
-            if (num.length < 13) return showCheckoutError('Número de cartão inválido.');
-            if (!/^\d{2}\/\d{2}$/.test(val)) return showCheckoutError('Validade inválida (use MM/AA).');
-            if (cvv.length < 3) return showCheckoutError('CVV inválido.');
-        }
-
-        console.log('Checkout (simulado — integração com Mercado Pago pendente):', {
-            plano: currentCheckoutPlan,
-            nome, whats,
-            metodo: selectedPaymentMethod
-        });
-
-        const btn = document.getElementById('checkoutSubmitBtn');
-        btn.disabled = true;
-        btn.textContent = 'Processando...';
-        setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = 'Finalizar Compra';
-            showCheckoutError('Checkout ainda não conectado ao Mercado Pago — isso é só o layout por enquanto. 🙂');
-        }, 900);
-    }
+    applyPlanLinks();
     /* ═══════════════════════════════════════════════════════════ */
 
     let player;
