@@ -893,6 +893,23 @@
             .card-row { flex-direction: column; gap: 0; }
 }
     </style>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2116314405584988');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2116314405584988&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -1185,23 +1202,66 @@
        POPUP DE CHECKOUT — integração real com Mercado Pago
        ═══════════════════════════════════════════════════════════ */
 
-    // ── Troque pela sua Public Key (comece com a de TESTE, "TEST-...") ──
-    const MP_PUBLIC_KEY = 'COLE_AQUI_SUA_PUBLIC_KEY';
+    // ── Public Key de produção do Mercado Pago (segura para expor no navegador) ──
+    const MP_PUBLIC_KEY = 'APP_USR-e45dd721-cfe5-47b0-a46d-7d311f476f24';
     const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
 
-    // Caminho dos endpoints PHP (ajuste se hospedar em outra pasta)
-    const MP_ENDPOINT_PIX    = '/mercadopago/criar-pix.php';
-    const MP_ENDPOINT_CARTAO = '/mercadopago/criar-cartao.php';
+    // Endpoint único no Supabase (Edge Function) — substitui os antigos PHPs
+    const MP_ENDPOINT = 'https://iminfhdxpuhitkmylvba.supabase.co/functions/v1/mp-checkout';
 
     let currentCheckoutPlan   = null;
     let selectedPaymentMethod = null;
     let pixCodeGenerated      = false;
     let paymentMethodIdCartao = null; // ex: "visa", "master" — detectado pelo BIN do cartão
+    let pixPaymentId          = null;
+    let pixPollInterval       = null;
+
+    /* Fica checando a cada 5s se o Pix já foi pago, enquanto o pop-up estiver aberto */
+    function iniciarPollingPix(paymentId) {
+        pararPollingPix();
+        pixPaymentId = paymentId;
+        pixPollInterval = setInterval(async () => {
+            try {
+                const resp = await fetch(MP_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'status', payment_id: paymentId })
+                });
+                const data = await resp.json();
+                if (data.status === 'approved') {
+                    pararPollingPix();
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Purchase', {
+                            content_name: currentCheckoutPlan,
+                            value: valorNumericoDoPlano(),
+                            currency: 'BRL'
+                        });
+                    }
+                    document.querySelector('.checkout-modal').innerHTML =
+                        '<div style="text-align:center; padding:20px 6px;">' +
+                        '<div style="font-size:2.6rem; margin-bottom:10px;">✅</div>' +
+                        '<div class="checkout-plan-name" style="margin-bottom:8px;">Pagamento aprovado!</div>' +
+                        '<p class="pix-note">Seu acesso será liberado em instantes. Qualquer dúvida, fale com a gente pelo WhatsApp.</p>' +
+                        '</div>';
+                }
+            } catch (err) {
+                /* silencioso — tenta de novo no próximo ciclo */
+            }
+        }, 5000);
+    }
+
+    function pararPollingPix() {
+        if (pixPollInterval) {
+            clearInterval(pixPollInterval);
+            pixPollInterval = null;
+        }
+    }
 
     function openCheckout(planKey) {
         const cfg = PLAN_CONFIG[planKey];
         if (!cfg) return;
         currentCheckoutPlan = planKey;
+        pararPollingPix();
 
         document.getElementById('checkoutPlanName').textContent  = cfg.nome;
         document.getElementById('checkoutPlanPrice').textContent = cfg.preco;
@@ -1234,6 +1294,14 @@
         overlay.classList.add('active');
         requestAnimationFrame(() => overlay.classList.add('show'));
         document.body.style.overflow = 'hidden';
+
+        if (typeof fbq === 'function') {
+            fbq('track', 'InitiateCheckout', {
+                content_name: planKey,
+                value: valorNumericoDoPlano(),
+                currency: 'BRL'
+            });
+        }
     }
 
     function closeCheckout() {
@@ -1241,6 +1309,7 @@
         overlay.classList.remove('show');
         document.body.style.overflow = '';
         setTimeout(() => overlay.classList.remove('active'), 250);
+        pararPollingPix();
     }
 
     document.getElementById('checkoutOverlay').addEventListener('click', closeCheckout);
@@ -1286,10 +1355,11 @@
         pixBox.textContent = 'Gerando código Pix…';
 
         try {
-            const resp = await fetch(MP_ENDPOINT_PIX, {
+            const resp = await fetch(MP_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    action: 'pix',
                     nome: dados.nome,
                     whatsapp: dados.whatsapp,
                     cpf: dados.cpf,
@@ -1307,6 +1377,7 @@
 
             pixBox.textContent = data.qr_code;
             pixCodeGenerated = true;
+            iniciarPollingPix(data.payment_id);
         } catch (err) {
             pixBox.textContent = 'Selecione Pix para gerar o código…';
             showCheckoutError('Erro de conexão ao gerar o Pix. Verifique o backend.');
@@ -1425,10 +1496,11 @@
                 identificationNumber: dados.cpf,
             });
 
-            const resp = await fetch(MP_ENDPOINT_CARTAO, {
+            const resp = await fetch(MP_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    action: 'cartao',
                     nome: dados.nome,
                     whatsapp: dados.whatsapp,
                     cpf: dados.cpf,
@@ -1450,6 +1522,13 @@
             }
 
             if (data.status === 'approved') {
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Purchase', {
+                        content_name: currentCheckoutPlan,
+                        value: valorNumericoDoPlano(),
+                        currency: 'BRL'
+                    });
+                }
                 document.querySelector('.checkout-modal').innerHTML =
                     '<div style="text-align:center; padding:20px 6px;">' +
                     '<div style="font-size:2.6rem; margin-bottom:10px;">✅</div>' +
