@@ -1600,8 +1600,20 @@
             events: {
                 onReady:       onPlayerReady,
                 onStateChange: onPlayerStateChange,
+                onError:       onPlayerError,
             }
         });
+    }
+
+    function onPlayerError(e) {
+        const motivos = {
+            2:   'ID de vídeo inválido.',
+            5:   'Erro ao reproduzir no player HTML5.',
+            100: 'Vídeo não encontrado, privado ou removido.',
+            101: 'O dono do vídeo desativou a reprodução em outros sites (embed).',
+            150: 'O dono do vídeo desativou a reprodução em outros sites (embed).'
+        };
+        console.error('Erro no player do YouTube (código ' + e.data + '): ' + (motivos[e.data] || 'motivo desconhecido'));
     }
 
     function onPlayerReady(e) {
