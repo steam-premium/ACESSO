@@ -457,8 +457,8 @@
     /* ═══════════════════════════════════════════════════════════
        CONFIGURAÇÃO  — edite apenas estas constantes
        ═══════════════════════════════════════════════════════════ */
-    const VIDEO_ID    = 'cLaIpRR07-k';          // ← ID do vídeo do YouTube
-    const CTA_SECOND  = 200;                     // 3 min 37s — momento em que o botão de WhatsApp aparece
+    const VIDEO_ID    = '7svZ-mjA2V4';          // ← ID do vídeo do YouTube
+    const CTA_SECOND  = 217;                     // 3 min 37s — momento em que o botão de WhatsApp aparece
     /* ═══════════════════════════════════════════════════════════ */
 
     let player;
@@ -534,6 +534,9 @@
 
         if (e.data === YT.PlayerState.ENDED) {
             videoEnded = true;
+            /* Se o vídeo terminar antes do botão ter sido liberado (ex.: assistido
+               em velocidade acelerada), libera o botão imediatamente aqui. */
+            if (!ctaShown) showCTA();
             if (ctaShown) exitFakeFullscreen();
         }
     }
@@ -552,29 +555,40 @@
             player.playVideo();
         } catch(err) { console.warn('Player not ready yet', err); }
 
-        startFakeProgress();
-        scheduleCTA();
+        startRealProgress();
 
         document.getElementById('videoControls').classList.add('active');
     }
 
-    /* ── Fake progress bar ── */
-    const K = 0.012;
-
-    function easeProgress(elapsed) {
-        const raw = 95 * (1 - Math.exp(-K * elapsed));
-        return Math.min(raw, 95);
-    }
-
-    let elapsedSec = 0;
-
-    function startFakeProgress() {
+    /* ── Progresso real, baseado no tempo de reprodução do vídeo ──
+       player.getCurrentTime() já avança de acordo com a velocidade
+       escolhida (1x, 1.5x, 2x), então a barra e a liberação do botão
+       acompanham automaticamente a velocidade de reprodução: se a
+       pessoa acelerar o vídeo, a barra acelera junto e o botão libera
+       assim que o vídeo (ou o tempo-alvo) é atingido — nunca depois
+       do vídeo terminar. ── */
+    function startRealProgress() {
         clearInterval(progressInterval);
         progressInterval = setInterval(() => {
-            elapsedSec += 0.5;
-            const pct = easeProgress(elapsedSec);
+            if (!player || typeof player.getCurrentTime !== 'function') return;
+
+            let currentTime = 0;
+            let duration = 0;
+            try {
+                currentTime = player.getCurrentTime() || 0;
+                duration    = player.getDuration() || 0;
+            } catch(_) { return; }
+
+            /* Se o vídeo for mais curto que o tempo configurado para o CTA,
+               usa a duração real do vídeo como referência de 100%. */
+            const ctaThreshold = duration > 0 ? Math.min(CTA_SECOND, duration) : CTA_SECOND;
+            const pct = Math.min((currentTime / ctaThreshold) * 100, 100);
             setProgressUI(pct);
-        }, 500);
+
+            if (!ctaShown && currentTime >= ctaThreshold - 0.15) {
+                showCTA();
+            }
+        }, 250);
     }
 
     function setProgressUI(pct) {
@@ -584,12 +598,10 @@
         if (label) label.textContent = Math.round(pct) + '%';
     }
 
-    /* ── Schedule the CTA button ── */
-    function scheduleCTA() {
-        ctaTimer = setTimeout(showCTA, CTA_SECOND * 1000);
-    }
-
     function showCTA() {
+        if (ctaShown) return;
+        ctaShown = true;
+
         clearInterval(progressInterval);
         setProgressUI(100);
         document.querySelector('.progress-label').textContent = 'Acesso liberado!';
@@ -600,7 +612,6 @@
             fbq('track', 'Lead');
         }
 
-        ctaShown = true;
         if (videoEnded) exitFakeFullscreen();
     }
 
@@ -621,7 +632,7 @@
         if (isPaused) {
             userPaused = false;
             player.playVideo();
-            startFakeProgress();
+            startRealProgress();
         } else {
             userPaused = true;
             player.pauseVideo();
