@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca Premium — Como ter todos jogos os titulos</title>
+    <title>Steam Premium — Como ter todos jogos com 100% de desconto</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
     <style>
         /* ─── TOKENS ─────────────────────────────────────────── */
@@ -18,9 +18,12 @@
             --muted:      rgba(255,255,255,0.45);
             --progress-h: 4px;
 
-            --wa-green:      #25d366;
-            --wa-green-dark: #1b8a3d;
-            --wa-green-glow: rgba(37,211,102,0.45);
+            /* ── EDIT THESE TWO VALUES ── */
+            --youtube-id:  "bCz4Ud-b-sA";          /* ← Cole o ID do vídeo aqui   */
+            --redirect-url: "http://www.gameflixoficial.com.br/"; /* ← Cole o link de destino   */
+            /* ─────────────────────────── */
+
+            --cta-time-ms: 283000; /* 4 min 43 s em milissegundos */
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,7 +54,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 48px 16px 60px;
+            padding: 48px 16px 120px;
         }
 
         /* ─── LOGO ───────────────────────────────────────────── */
@@ -97,12 +100,11 @@
             position: relative;
         }
 
+        /* Aspect-ratio wrapper for the player */
         .video-ratio {
             position: relative;
             width: 100%;
-            max-width: 460px;
-            margin: 0 auto;
-            padding-bottom: 177.78%; /* 9:16 — modo retrato */
+            padding-bottom: 56.25%;
         }
         .video-ratio #player {
             position: absolute;
@@ -112,6 +114,7 @@
             border: none;
         }
 
+        /* Invisible interaction blocker — prevents pause/seek clicks reaching YouTube */
         .video-blocker {
             position: absolute;
             inset: 0;
@@ -119,74 +122,6 @@
             cursor: default;
             -webkit-tap-highlight-color: transparent;
         }
-
-        body.video-fullscreen-active { overflow: hidden; }
-
-        .video-card.fake-fs-active {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            border-radius: 0;
-            border: none;
-            box-shadow: none;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9998;
-        }
-        .video-card.fake-fs-active .video-ratio {
-            width: 100%;
-            height: 100%;
-            padding-bottom: 0;
-            overflow: hidden;
-        }
-        .video-card.fake-fs-active .video-ratio #player,
-        .video-card.fake-fs-active .video-ratio iframe {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .video-card.fake-fs-active .progress-track,
-        .video-card.fake-fs-active .progress-meta {
-            display: none;
-        }
-
-        .video-controls {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            z-index: 30;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .video-controls.active { display: flex; }
-        .vc-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 38px;
-            height: 38px;
-            padding: 0 10px;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.18);
-            border-radius: 6px;
-            color: #fff;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            -webkit-tap-highlight-color: transparent;
-            transition: background 0.2s ease;
-        }
-        .vc-btn:hover, .vc-btn:active { background: rgba(0,0,0,0.85); }
-        .vc-btn svg { width: 18px; height: 18px; fill: #fff; pointer-events: none; }
 
         /* ─── CLICK-TO-PLAY OVERLAY ──────────────────────────── */
         .overlay {
@@ -256,6 +191,7 @@
             box-shadow: 0 0 6px var(--red);
         }
 
+        /* Progress label row */
         .progress-meta {
             display: flex;
             justify-content: space-between;
@@ -276,74 +212,55 @@
             color: var(--red);
         }
 
-        /* ═══════════════════════════════════════════════════════════
-           BOTÃO DE WHATSAPP — único CTA após o vídeo
-           ═══════════════════════════════════════════════════════════ */
-        #whatsapp-wrap {
+        /* ─── CTA BUTTON ─────────────────────────────────────── */
+        #cta-wrap {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 820px;
-            margin-top: 30px;
+            padding: 20px 16px 28px;
+            background: linear-gradient(to top, rgba(0,0,0,0.98) 60%, transparent);
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
+            justify-content: center;
+            z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(16px);
-            max-height: 0;
-            overflow: hidden;
-            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
-            text-align: center;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
         }
-        #whatsapp-wrap.visible {
+        #cta-wrap.visible {
             opacity: 1;
             pointer-events: auto;
             transform: translateY(0);
-            max-height: 400px;
         }
-        .whatsapp-heading {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 800;
-            font-size: clamp(1.2rem, 3.6vw, 1.5rem);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .whatsapp-subheading {
-            font-size: 0.88rem;
-            color: var(--muted);
-            max-width: 460px;
-        }
-        .whatsapp-btn {
+
+        .cta-btn {
             display: inline-flex;
             align-items: center;
             gap: 14px;
-            padding: 18px 44px;
-            max-width: 480px;
+            padding: 18px 48px;
+            max-width: 500px;
             width: 100%;
             justify-content: center;
             font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 800;
-            font-size: 1.15rem;
-            letter-spacing: 0.05em;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             text-decoration: none;
             color: #fff;
-            background: linear-gradient(135deg, var(--wa-green-dark) 0%, var(--wa-green) 55%, #34e37a 100%);
-            border-radius: 50px;
+            background: linear-gradient(135deg, #c40812 0%, #e50914 50%, #ff2a2a 100%);
+            border-radius: 6px;
             border: none;
             cursor: pointer;
             box-shadow:
-                0 0 0 2px rgba(37,211,102,0.25),
-                0 0 34px var(--wa-green-glow),
-                0 6px 26px rgba(0,0,0,0.6);
-            transition: box-shadow 0.25s ease, transform 0.25s ease;
-            animation: float-cta 2.6s ease-in-out infinite;
+                0 0 0 2px rgba(229,9,20,0.3),
+                0 0 40px rgba(229,9,20,0.5),
+                0 4px 24px rgba(0,0,0,0.6);
+            animation: float-cta 2.4s ease-in-out infinite;
         }
-        .whatsapp-btn:hover {
-            box-shadow: 0 0 0 2px rgba(37,211,102,0.55), 0 0 48px var(--wa-green-glow), 0 6px 26px rgba(0,0,0,0.6);
-            transform: translateY(-3px);
-        }
-        .whatsapp-btn svg { width: 24px; height: 24px; fill: #fff; flex-shrink: 0; }
+        .cta-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
+        .cta-btn:hover { box-shadow: 0 0 0 2px rgba(229,9,20,0.6), 0 0 60px rgba(229,9,20,0.7), 0 4px 24px rgba(0,0,0,0.6); }
 
         /* ─── ANIMATIONS ─────────────────────────────────────── */
         @keyframes pulse-icon {
@@ -360,38 +277,28 @@
         }
 
         /* ─── MOBILE ─────────────────────────────────────────── */
-        @media (max-width: 600px) {
-            .page { padding: 28px 8px 48px; }
-            .logo { font-size: 1.6rem; margin-bottom: 22px; }
-            .video-card { border-radius: 6px; }
-            .whatsapp-btn { padding: 16px 24px; font-size: 1rem; }
-        }
+           @media (max-width: 600px) {
+    .page { padding: 28px 8px 110px; }
+    .logo { font-size: 1.6rem; margin-bottom: 22px; }
+    .video-card { border-radius: 6px; }
+    .cta-btn { font-size: 1.1rem; padding: 16px 24px; }
+
+    #cta-wrap {
+        bottom: 120px;
+    }
+}
     </style>
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2116314405584988');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=2116314405584988&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
 </head>
 <body>
 
 <div class="page">
 
+    <!-- Logo -->
+    
+
     <!-- Headline -->
     <h1 class="headline">
-        BIBLIOTECA COMPLETA<br>DE JOGOS EM<em> 2 MINUTOS</em>
+        COMO TER TODOS JOGOS<br>DA STEAM <em>DE GRAÇA</em>
     </h1>
 
     <!-- Video Card -->
@@ -402,27 +309,17 @@
             <div id="player"></div>
             <!-- Blocks all native YouTube clicks (pause, seek, info cards, etc.) -->
             <div class="video-blocker" id="blocker"></div>
-
-            <!-- Controles próprios (play/pause, velocidade, tela cheia) -->
-            <div class="video-controls" id="videoControls">
-                <button type="button" class="vc-btn" id="btnPlayPause" aria-label="Play/Pause">
-                    <svg id="iconPlayPause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-                <button type="button" class="vc-btn" id="btnSpeed" aria-label="Velocidade">1x</button>
-                <button type="button" class="vc-btn" id="btnFullscreen" aria-label="Tela cheia">
-                    <svg id="iconFullscreen" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                </button>
-            </div>
         </div>
 
         <!-- Click-to-play overlay -->
         <div class="overlay" id="overlay" onclick="startVideo()">
             <div class="overlay-icon">
+                <!-- Speaker / audio icon -->
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
                 </svg>
             </div>
-            <div class="overlay-label">QUERO VER AGORA</div>
+            <div class="overlay-label">Clique para assistir com áudio</div>
         </div>
 
         <!-- Progress bar -->
@@ -436,44 +333,39 @@
 
     </div><!-- /.video-card -->
 
-    <!-- BOTÃO DE WHATSAPP — aparece quando o acesso é liberado -->
-    <div id="whatsapp-wrap">
-        <div class="whatsapp-heading">Acesso liberado!</div>
-        <p class="whatsapp-subheading">Fale agora no WhatsApp e escolha o plano ideal para o seu bolso.</p>
-        <a href="https://wa.me/5553981021909?text=Assisti%20o%20v%C3%ADdeo%20e%20quero%20escolher%20um%20plano%20que%20se%20encaixe%20no%20meu%20or%C3%A7amento!"
-           class="whatsapp-btn" id="whatsappBtn" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.48 1.32 5.01L2.05 22l5.25-1.37a9.94 9.94 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.93 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.55-3.7 8.25-8.25 8.25a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.55 3.71-8.25 8.26-8.25M8.53 6.85c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2.03 0 1.2.87 2.36.99 2.52.12.16 1.7 2.72 4.2 3.71 2.08.82 2.5.66 2.95.62.45-.04 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28-.24-.12-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.12-.16.24-.63.8-.78.96-.14.16-.29.18-.53.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.35-1.67-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.34-.76-1.83-.2-.48-.4-.4-.55-.41-.14 0-.3-.01-.46-.01z"/>
-            </svg>
-            Falar no WhatsApp
-        </a>
-    </div>
-
 </div><!-- /.page -->
+
+<!-- CTA — appears at 4:43 -->
+<div id="cta-wrap">
+    <!--
+        ┌──────────────────────────────────────────────────────────┐
+        │  INSIRA o link de destino no atributo href abaixo:       │
+        │  <a href="SEU_LINK_AQUI" ...>                            │
+        └──────────────────────────────────────────────────────────┘
+    -->
+    <a href="https://wa.me/message/SA53EQAF7RTVH1/" class="cta-btn" id="ctaBtn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 5v14l11-7z"/>
+        </svg>
+        Acessar a STEAM PREMIUM agora
+    </a>
+</div>
 
 <!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
     /* ═══════════════════════════════════════════════════════════
-       CONFIGURAÇÃO  — edite apenas estas constantes
+       CONFIGURAÇÃO  — edite apenas estas duas constantes
        ═══════════════════════════════════════════════════════════ */
-    const VIDEO_ID    = 'cLaIpRR07-k';          // ← ID do vídeo do YouTube
-    const CTA_SECOND  = 217;                     // 3 min 37s — momento em que o botão de WhatsApp aparece
+    const VIDEO_ID    = 'dL2QHhxPSlY';          // ← ID do vídeo do YouTube
+    const REDIRECT    = 'https://wa.me/message/SA53EQAF7RTVH1/'; // ← URL de destino
+    const CTA_SECOND  = 5;                     // 4 min 43 s  (não altere)
     /* ═══════════════════════════════════════════════════════════ */
 
     let player;
     let progressInterval = null;
     let ctaTimer         = null;
     let started          = false;
-
-    /* Estado dos controles e da tela cheia */
-    let isPaused      = false;
-    let userPaused     = false;
-    let speedIndex     = 0;
-    const SPEED_STEPS  = [1, 1.5, 2];
-    let isFullscreen   = false;
-    let videoEnded      = false;
-    let ctaShown        = false;
 
     /* ── YouTube Player ready ── */
     function onYouTubeIframeAPIReady() {
@@ -495,49 +387,18 @@
             events: {
                 onReady:       onPlayerReady,
                 onStateChange: onPlayerStateChange,
-                onError:       onPlayerError,
             }
         });
     }
 
-    function onPlayerError(e) {
-        const motivos = {
-            2:   'ID de vídeo inválido.',
-            5:   'Erro ao reproduzir no player HTML5.',
-            100: 'Vídeo não encontrado, privado ou removido.',
-            101: 'O dono do vídeo desativou a reprodução em outros sites (embed).',
-            150: 'O dono do vídeo desativou a reprodução em outros sites (embed).'
-        };
-        console.error('Erro no player do YouTube (código ' + e.data + '): ' + (motivos[e.data] || 'motivo desconhecido'));
-    }
-
     function onPlayerReady(e) {
-        try {
-            e.target.setPlaybackQuality('highres');
-        } catch(_){}
+        /* Video is muted + auto-playing in background; overlay is shown */
     }
 
     function onPlayerStateChange(e) {
-        if (e.data === YT.PlayerState.PAUSED && started && !userPaused) {
+        /* Keep playing if paused externally */
+        if (e.data === YT.PlayerState.PAUSED && started) {
             setTimeout(() => { try { player.playVideo(); } catch(_){} }, 200);
-        }
-
-        if (e.data === YT.PlayerState.PLAYING) {
-            isPaused = false;
-            updatePlayPauseIcon();
-            try { player.setPlaybackQuality('highres'); } catch(_){}
-        }
-        if (e.data === YT.PlayerState.PAUSED) {
-            isPaused = true;
-            updatePlayPauseIcon();
-        }
-
-        if (e.data === YT.PlayerState.ENDED) {
-            videoEnded = true;
-            /* Se o vídeo terminar antes do botão ter sido liberado (ex.: assistido
-               em velocidade acelerada), libera o botão imediatamente aqui. */
-            if (!ctaShown) showCTA();
-            if (ctaShown) exitFakeFullscreen();
         }
     }
 
@@ -555,40 +416,31 @@
             player.playVideo();
         } catch(err) { console.warn('Player not ready yet', err); }
 
-        startRealProgress();
-
-        document.getElementById('videoControls').classList.add('active');
+        startFakeProgress();
+        scheduleCTA();
     }
 
-    /* ── Progresso real, baseado no tempo de reprodução do vídeo ──
-       player.getCurrentTime() já avança de acordo com a velocidade
-       escolhida (1x, 1.5x, 2x), então a barra e a liberação do botão
-       acompanham automaticamente a velocidade de reprodução: se a
-       pessoa acelerar o vídeo, a barra acelera junto e o botão libera
-       assim que o vídeo (ou o tempo-alvo) é atingido — nunca depois
-       do vídeo terminar. ── */
-    function startRealProgress() {
-        clearInterval(progressInterval);
+    /* ── Fake progress bar ──────────────────────────────────────
+       Easing: fast at the start, slows toward 95%.
+       Formula: progress = 95 * (1 - e^(-k*t)) capped at 95.
+       CTA reveal forces it to 100 when the button appears.
+    ─────────────────────────────────────────────────────────── */
+    const TOTAL_DURATION = 340;   // slightly longer than CTA_SECOND for natural feel
+    const K              = 0.012; // decay constant — lower = slower saturation
+
+    function easeProgress(elapsed) {
+        const raw = 95 * (1 - Math.exp(-K * elapsed));
+        return Math.min(raw, 95);
+    }
+
+    let elapsedSec = 0;
+
+    function startFakeProgress() {
         progressInterval = setInterval(() => {
-            if (!player || typeof player.getCurrentTime !== 'function') return;
-
-            let currentTime = 0;
-            let duration = 0;
-            try {
-                currentTime = player.getCurrentTime() || 0;
-                duration    = player.getDuration() || 0;
-            } catch(_) { return; }
-
-            /* Se o vídeo for mais curto que o tempo configurado para o CTA,
-               usa a duração real do vídeo como referência de 100%. */
-            const ctaThreshold = duration > 0 ? Math.min(CTA_SECOND, duration) : CTA_SECOND;
-            const pct = Math.min((currentTime / ctaThreshold) * 100, 100);
+            elapsedSec += 0.5;
+            const pct = easeProgress(elapsedSec);
             setProgressUI(pct);
-
-            if (!ctaShown && currentTime >= ctaThreshold - 0.15) {
-                showCTA();
-            }
-        }, 250);
+        }, 500);
     }
 
     function setProgressUI(pct) {
@@ -598,79 +450,22 @@
         if (label) label.textContent = Math.round(pct) + '%';
     }
 
-    function showCTA() {
-        if (ctaShown) return;
-        ctaShown = true;
+    /* ── Schedule the CTA button ── */
+    function scheduleCTA() {
+        ctaTimer = setTimeout(showCTA, CTA_SECOND * 1000);
+    }
 
+    function showCTA() {
+        /* Snap progress to 100% */
         clearInterval(progressInterval);
         setProgressUI(100);
         document.querySelector('.progress-label').textContent = 'Acesso liberado!';
 
-        document.getElementById('whatsapp-wrap').classList.add('visible');
+        /* Reveal CTA */
+        document.getElementById('cta-wrap').classList.add('visible');
 
-        if (typeof fbq === 'function') {
-            fbq('track', 'Lead');
-        }
-
-        if (videoEnded) exitFakeFullscreen();
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       Controles customizados
-       ═══════════════════════════════════════════════════════════ */
-    const ICON_PLAY  = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>';
-    const ICON_PAUSE = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-
-    function updatePlayPauseIcon() {
-        const icon = document.getElementById('iconPlayPause');
-        if (icon) icon.outerHTML = isPaused ? ICON_PLAY.replace('<svg ', '<svg id="iconPlayPause" ') : ICON_PAUSE.replace('<svg ', '<svg id="iconPlayPause" ');
-    }
-
-    document.getElementById('btnPlayPause').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!started || !player) return;
-        if (isPaused) {
-            userPaused = false;
-            player.playVideo();
-            startRealProgress();
-        } else {
-            userPaused = true;
-            player.pauseVideo();
-            clearInterval(progressInterval);
-        }
-    });
-
-    document.getElementById('btnSpeed').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!started || !player) return;
-        speedIndex = (speedIndex + 1) % SPEED_STEPS.length;
-        const rate = SPEED_STEPS[speedIndex];
-        try { player.setPlaybackRate(rate); } catch(_){}
-        document.getElementById('btnSpeed').textContent = rate + 'x';
-    });
-
-    document.getElementById('btnFullscreen').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (isFullscreen) exitFakeFullscreen(); else enterFakeFullscreen();
-    });
-
-    /* ═══════════════════════════════════════════════════════════
-       Tela cheia falsa (via CSS, sem controles nativos)
-       ═══════════════════════════════════════════════════════════ */
-    function enterFakeFullscreen() {
-        if (isFullscreen) return;
-        isFullscreen = true;
-        const el = document.querySelector('.video-card');
-        document.body.classList.add('video-fullscreen-active');
-        el.classList.add('fake-fs-active');
-    }
-
-    function exitFakeFullscreen() {
-        if (!isFullscreen) return;
-        isFullscreen = false;
-        const el = document.querySelector('.video-card');
-        document.body.classList.remove('video-fullscreen-active');
-        el.classList.remove('fake-fs-active');
+        /* Update link with the redirect URL */
+        document.getElementById('ctaBtn').href = REDIRECT;
     }
 
     /* ── Prevent right-click context menu on the video area ── */
