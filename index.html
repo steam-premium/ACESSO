@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Premium — Como ter todos jogos com 100% de desconto</title>
+    <title>Biblioteca Premium — Como ter todos jogos os titulos</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
     <style>
         /* ─── TOKENS ─────────────────────────────────────────── */
@@ -19,8 +19,8 @@
             --progress-h: 4px;
 
             /* ── EDIT THESE TWO VALUES ── */
-            --youtube-id:  "bCz4Ud-b-sA";          /* ← Cole o ID do vídeo aqui   */
-            --redirect-url: "http://www.gameflixoficial.com.br/"; /* ← Cole o link de destino   */
+            --youtube-id:  "7svZ-mjA2V4";          /* ← Cole o ID do vídeo aqui   */
+            --redirect-url: "WWWWWWWWWWWWWWWWWWWWWWWWWWWW/"; /* ← Cole o link de destino   */
             /* ─────────────────────────── */
 
             --cta-time-ms: 283000; /* 4 min 43 s em milissegundos */
@@ -54,7 +54,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 48px 16px 120px;
+            padding: 48px 16px 60px;
         }
 
         /* ─── LOGO ───────────────────────────────────────────── */
@@ -122,6 +122,79 @@
             cursor: default;
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* ─── AJUSTE 1: TELA CHEIA (nativa do navegador, Fullscreen API) ───────────── */
+        body.video-fullscreen-active { overflow: hidden; }
+
+        /* Fullscreen "falso" via CSS (não depende da Fullscreen API nativa,
+           que não é suportada em elementos arbitrários no Safari/iOS).
+           Funciona em qualquer dispositivo, inclusive celular. */
+        .video-card.fake-fs-active {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+        .video-card.fake-fs-active .video-ratio {
+            width: 100%;
+            height: 100%;
+            padding-bottom: 0;
+            overflow: hidden;
+        }
+        .video-card.fake-fs-active .video-ratio #player,
+        .video-card.fake-fs-active .video-ratio iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-card.fake-fs-active .progress-track,
+        .video-card.fake-fs-active .progress-meta {
+            display: none;
+        }
+
+        /* ─── AJUSTE 3: CONTROLES CUSTOMIZADOS ────────────────── */
+        .video-controls {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            z-index: 30;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .video-controls.active { display: flex; }
+        .vc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s ease;
+        }
+        .vc-btn:hover, .vc-btn:active { background: rgba(0,0,0,0.85); }
+        .vc-btn svg { width: 18px; height: 18px; fill: #fff; pointer-events: none; }
 
         /* ─── CLICK-TO-PLAY OVERLAY ──────────────────────────── */
         .overlay {
@@ -212,55 +285,452 @@
             color: var(--red);
         }
 
-        /* ─── CTA BUTTON ─────────────────────────────────────── */
-        #cta-wrap {
-            position: fixed;
-            bottom: 0;
-            left: 0;
+        /* ═══════════════════════════════════════════════════════════
+           PLANOS — seção de escolha de planos (substitui o CTA único)
+           ═══════════════════════════════════════════════════════════ */
+        #plans-wrap {
             width: 100%;
-            padding: 20px 16px 28px;
-            background: linear-gradient(to top, rgba(0,0,0,0.98) 60%, transparent);
-            display: flex;
-            justify-content: center;
-            z-index: 1000;
+            max-width: 820px;
+            margin-top: 26px;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
+            text-align: center;
         }
-        #cta-wrap.visible {
+        #plans-wrap.visible {
             opacity: 1;
             pointer-events: auto;
             transform: translateY(0);
+            max-height: 2200px;
+        }
+        .plans-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.5rem, 4.4vw, 2.1rem);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .plans-subtitle {
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-bottom: 28px;
+        }
+        .plans-grid {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .plan-card {
+            flex: 1 1 320px;
+            max-width: 360px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 34px 26px 28px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            text-align: left;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        }
+        .plan-card--featured {
+            border-color: rgba(229,9,20,0.55);
+            box-shadow:
+                0 0 0 1px var(--red-dim),
+                0 8px 50px rgba(0,0,0,0.7),
+                0 0 60px var(--red-dim);
+        }
+        .plan-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--red);
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px var(--red-glow);
+            white-space: nowrap;
+        }
+        .plan-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .plan-price {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 2.3rem;
+            margin-bottom: 20px;
+        }
+        .plan-benefits {
+            list-style: none;
+            margin-bottom: 26px;
+            flex-grow: 1;
+        }
+        .plan-benefits li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.82);
+            line-height: 1.4;
+        }
+        .plan-benefits li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--red);
+            font-weight: 700;
+        }
+        .plan-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px 18px;
+            text-decoration: none;
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.98rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #1b8a3d 0%, #25d366 55%, #34e37a 100%);
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 0 2px rgba(37,211,102,0.25), 0 0 26px rgba(37,211,102,0.35);
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .plan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 2px rgba(37,211,102,0.5), 0 0 40px rgba(37,211,102,0.55);
+        }
+        @media (max-width: 700px) {
+            .plans-grid { flex-direction: column; align-items: center; }
+            .plan-card { max-width: 100%; width: 100%; }
         }
 
-        .cta-btn {
+        /* ═══════════════════════════════════════════════════════════
+           GARANTIA DE 7 DIAS
+           ═══════════════════════════════════════════════════════════ */
+        #guarantee-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 26px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
+            text-align: center;
+            padding: 4px 20px;
+        }
+        #guarantee-wrap.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 300px;
+        }
+        .guarantee-icon {
+            font-size: 1.9rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px var(--red-dim));
+        }
+        .guarantee-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .guarantee-text {
+            font-size: 0.86rem;
+            color: var(--muted);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.55;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ELEMENTOS DE CONFIANÇA / SEGURANÇA
+           ═══════════════════════════════════════════════════════════ */
+        #trust-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 22px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px 26px;
+            padding: 4px 10px;
+        }
+        #trust-wrap.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 200px;
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.76rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* Título acima do carrossel de provas sociais */
+        .social-proof-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .social-proof-subtitle {
+            font-size: 0.84rem;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* ─── AJUSTE 2: CARROSSEL DE PROVA SOCIAL ─────────────── */
+        #social-proof-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 22px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease;
+        }
+        #social-proof-wrap.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 600px;
+        }
+        .carousel-outer {
+            position: relative;
+            width: 100%;
+            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+        }
+        .carousel-track {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 4px 32px;
+            cursor: grab;
+            user-select: none;
+        }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-track.dragging { cursor: grabbing; scroll-snap-type: none; }
+        .carousel-slide {
+            flex: 0 0 78%;
+            max-width: 320px;
+            aspect-ratio: 4 / 8;
+            scroll-snap-align: center;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-align: center;
+            padding: 12px;
+            pointer-events: none;
+        }
+        @media (max-width: 600px) {
+            .carousel-slide { flex: 0 0 82%; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           AJUSTE: BLOCO "COMPRAR AGORA" + "DÚVIDAS FREQUENTES"
+           (substitui a antiga caixa de escolha de plano)
+           ═══════════════════════════════════════════════════════════ */
+        #cta-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 26px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .buy-now-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            padding: 18px 24px;
+            text-decoration: none;
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ff2733 0%, var(--red) 55%, #a80710 100%);
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 0 2px var(--red-dim), 0 0 32px var(--red-glow), 0 4px 24px rgba(0,0,0,0.6);
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            animation: pulse-btn 1.8s ease-in-out infinite;
+        }
+        .buy-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 2px var(--red-dim), 0 0 46px var(--red-glow), 0 4px 24px rgba(0,0,0,0.6);
+        }
+
+        /* ─── ACORDEON: DÚVIDAS FREQUENTES ────────────────────── */
+        .faq-accordion {
+            width: 100%;
+            max-width: 500px;
+        }
+        .faq-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.98rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        .faq-toggle-btn:hover { border-color: rgba(255,255,255,0.18); }
+        .faq-toggle-icon {
+            display: inline-flex;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+        .faq-toggle-icon svg { width: 18px; height: 18px; fill: var(--red); }
+        .faq-toggle-btn.open .faq-toggle-icon { transform: rotate(180deg); }
+
+        .faq-accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.4s ease, margin-top 0.4s ease;
+        }
+        .faq-accordion-panel.open {
+            max-height: 900px;
+            opacity: 1;
+            margin-top: 16px;
+        }
+        /* O vídeo de dúvidas reaproveita o mesmo componente visual (.video-card)
+           do vídeo principal, só que em tamanho de acordeon */
+        .faq-accordion-panel .video-card {
+            max-width: 100%;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 8px 40px rgba(0,0,0,0.7);
+        }
+
+        /* ─── BOTÃO DE WHATSAPP (abaixo do carrossel) ─────────── */
+        #whatsapp-wrap {
+            width: 100%;
+            max-width: 820px;
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px);
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin-top 0.6s ease;
+        }
+        #whatsapp-wrap.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            max-height: 200px;
+        }
+        .whatsapp-btn {
             display: inline-flex;
             align-items: center;
             gap: 14px;
-            padding: 18px 48px;
+            padding: 16px 40px;
             max-width: 500px;
             width: 100%;
             justify-content: center;
             font-family: 'Barlow Condensed', sans-serif;
             font-weight: 700;
-            font-size: 1.3rem;
-            letter-spacing: 0.08em;
+            font-size: 1.05rem;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
             text-decoration: none;
             color: #fff;
-            background: linear-gradient(135deg, #c40812 0%, #e50914 50%, #ff2a2a 100%);
+            background: linear-gradient(135deg, #1b8a3d 0%, #25d366 55%, #34e37a 100%);
             border-radius: 6px;
             border: none;
             cursor: pointer;
             box-shadow:
-                0 0 0 2px rgba(229,9,20,0.3),
-                0 0 40px rgba(229,9,20,0.5),
+                0 0 0 2px rgba(37,211,102,0.25),
+                0 0 32px rgba(37,211,102,0.4),
                 0 4px 24px rgba(0,0,0,0.6);
-            animation: float-cta 2.4s ease-in-out infinite;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
         }
-        .cta-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
-        .cta-btn:hover { box-shadow: 0 0 0 2px rgba(229,9,20,0.6), 0 0 60px rgba(229,9,20,0.7), 0 4px 24px rgba(0,0,0,0.6); }
+        .whatsapp-btn:hover {
+            box-shadow: 0 0 0 2px rgba(37,211,102,0.55), 0 0 46px rgba(37,211,102,0.6), 0 4px 24px rgba(0,0,0,0.6);
+            transform: translateY(-2px);
+        }
+        .whatsapp-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
 
         /* ─── ANIMATIONS ─────────────────────────────────────── */
         @keyframes pulse-icon {
@@ -278,16 +748,261 @@
 
         /* ─── MOBILE ─────────────────────────────────────────── */
            @media (max-width: 600px) {
-    .page { padding: 28px 8px 110px; }
+    .page { padding: 28px 8px 48px; }
     .logo { font-size: 1.6rem; margin-bottom: 22px; }
     .video-card { border-radius: 6px; }
-    .cta-btn { font-size: 1.1rem; padding: 16px 24px; }
+    .plan-price { font-size: 2rem; }
+        }
 
-    #cta-wrap {
-        bottom: 120px;
-    }
+        /* ═══════════════════════════════════════════════════════════
+           POPUP DE CHECKOUT
+           ═══════════════════════════════════════════════════════════ */
+        .checkout-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(0,0,0,0.86);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .checkout-overlay.active { display: flex; }
+        .checkout-overlay.show { opacity: 1; }
+
+        .checkout-modal {
+            width: 100%;
+            max-width: 440px;
+            max-height: 92vh;
+            overflow-y: auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 20px 80px rgba(0,0,0,0.85),
+                0 0 90px var(--red-dim);
+            padding: 30px 24px 26px;
+            position: relative;
+            transform: translateY(18px) scale(0.98);
+            transition: transform 0.3s ease;
+        }
+        .checkout-overlay.show .checkout-modal { transform: translateY(0) scale(1); }
+
+        .checkout-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--muted);
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .2s ease, color .2s ease;
+        }
+        .checkout-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .checkout-header { margin-bottom: 22px; text-align: center; }
+        .checkout-eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        .checkout-plan-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            color: var(--text);
+        }
+        .checkout-plan-price {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 2.1rem;
+            color: var(--red);
+            text-shadow: 0 0 24px var(--red-glow);
+            margin-top: 2px;
+        }
+
+        .checkout-error {
+            display: none;
+            background: rgba(229,9,20,0.1);
+            border: 1px solid rgba(229,9,20,0.4);
+            color: #ff9498;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            padding: 10px 12px;
+            border-radius: 7px;
+            margin-bottom: 14px;
+        }
+        .checkout-error.show { display: block; }
+
+        .checkout-field { margin-bottom: 16px; }
+        .checkout-label {
+            display: block;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+        .checkout-input {
+            width: 100%;
+            padding: 13px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color .2s ease, background .2s ease;
+        }
+        .checkout-input::placeholder { color: rgba(255,255,255,0.28); }
+        .checkout-input:focus { border-color: var(--red); background: rgba(255,255,255,0.06); }
+
+        .checkout-pay-toggle { display: flex; gap: 10px; margin-bottom: 18px; }
+        .pay-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            color: var(--muted);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all .2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pay-option svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+        .pay-option.active {
+            border-color: var(--red);
+            color: #fff;
+            background: var(--red-dim);
+            box-shadow: 0 0 20px var(--red-dim);
+        }
+
+        .pay-panel { display: none; }
+        .pay-panel.active { display: block; }
+
+        .pix-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(255,255,255,0.18);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .pix-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.76rem;
+            color: rgba(255,255,255,0.75);
+            word-break: break-all;
+            line-height: 1.5;
+            max-height: 90px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+        .pix-copy-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 7px;
+            background: linear-gradient(135deg, #1b8a3d 0%, #25d366 55%, #34e37a 100%);
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .pix-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 0 24px rgba(37,211,102,0.4); }
+        .pix-copy-btn.copied { background: linear-gradient(135deg, #0e5c26 0%, #1b8a3d 100%); }
+        .pix-note { font-size: 0.78rem; color: var(--muted); text-align: center; line-height: 1.4; }
+
+        .card-row { display: flex; gap: 12px; }
+        .card-row .checkout-field { flex: 1; }
+
+        .checkout-submit {
+            width: 100%;
+            padding: 16px;
+            margin-top: 6px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--red) 0%, #ff2b3a 100%);
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 0 2px var(--red-dim), 0 0 30px var(--red-glow);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .checkout-submit:hover { transform: translateY(-2px); box-shadow: 0 0 0 2px var(--red-dim), 0 0 44px var(--red-glow); }
+        .checkout-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+        .checkout-secure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 14px;
+            font-size: 0.76rem;
+            color: var(--muted);
+        }
+
+        @media (max-width: 480px) {
+            .checkout-modal { padding: 26px 18px 22px; }
+            .card-row { flex-direction: column; gap: 0; }
 }
     </style>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2116314405584988');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2116314405584988&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -298,7 +1013,7 @@
 
     <!-- Headline -->
     <h1 class="headline">
-        COMO TER TODOS JOGOS<br>DA STEAM <em>DE GRAÇA</em>
+        BIBLIOTECA COMPLETA<br>DE JOGOS EM<em> 2 MINUTOS</em>
     </h1>
 
     <!-- Video Card -->
@@ -309,6 +1024,17 @@
             <div id="player"></div>
             <!-- Blocks all native YouTube clicks (pause, seek, info cards, etc.) -->
             <div class="video-blocker" id="blocker"></div>
+
+            <!-- AJUSTE 3: Controles próprios (play/pause, velocidade, tela cheia) -->
+            <div class="video-controls" id="videoControls">
+                <button type="button" class="vc-btn" id="btnPlayPause" aria-label="Play/Pause">
+                    <svg id="iconPlayPause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button type="button" class="vc-btn" id="btnSpeed" aria-label="Velocidade">1x</button>
+                <button type="button" class="vc-btn" id="btnFullscreen" aria-label="Tela cheia">
+                    <svg id="iconFullscreen" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+            </div>
         </div>
 
         <!-- Click-to-play overlay -->
@@ -319,7 +1045,7 @@
                     <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
                 </svg>
             </div>
-            <div class="overlay-label">Clique para assistir com áudio</div>
+            <div class="overlay-label">QUERO VER AGORA</div>
         </div>
 
         <!-- Progress bar -->
@@ -333,39 +1059,748 @@
 
     </div><!-- /.video-card -->
 
+    <!-- AJUSTE: bloco "Comprar Agora" + "Dúvidas Frequentes" (substitui a antiga caixa de escolha de plano) -->
+    <div id="cta-wrap" class="visible">
+
+        <!-- Abre o pop-up de checkout já existente, sempre no plano de R$ 97,90 -->
+        <button type="button" class="buy-now-btn" id="buyNowBtn">
+            COMPRAR AGORA
+        </button>
+
+        <!-- Acordeon de dúvidas frequentes -->
+        <div class="faq-accordion">
+            <button type="button" class="faq-toggle-btn" id="faqToggleBtn" aria-expanded="false" aria-controls="faqAccordionPanel">
+                <span>DÚVIDAS FREQUENTES</span>
+                <span class="faq-toggle-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
+                </span>
+            </button>
+
+            <div class="faq-accordion-panel" id="faqAccordionPanel">
+                <!-- Vídeo de dúvidas — mesma configuração/estrutura do vídeo principal -->
+                <div class="video-card">
+                    <div class="video-ratio">
+                        <div id="playerFaq"></div>
+                        <!-- Blocks all native YouTube clicks (pause, seek, info cards, etc.) -->
+                        <div class="video-blocker" id="blockerFaq"></div>
+
+                        <!-- Controles próprios (play/pause, velocidade, tela cheia) -->
+                        <div class="video-controls" id="videoControlsFaq">
+                            <button type="button" class="vc-btn" id="btnPlayPauseFaq" aria-label="Play/Pause">
+                                <svg id="iconPlayPauseFaq" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <button type="button" class="vc-btn" id="btnSpeedFaq" aria-label="Velocidade">1x</button>
+                            <button type="button" class="vc-btn" id="btnFullscreenFaq" aria-label="Tela cheia">
+                                <svg id="iconFullscreenFaq" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Click-to-play overlay -->
+                    <div class="overlay" id="overlayFaq">
+                        <div class="overlay-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
+                            </svg>
+                        </div>
+                        <div class="overlay-label">VER VÍDEO</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- AJUSTE 2: Carrossel de prova social (existente, reaproveitado) — agora aparece junto com a oferta -->
+    <div id="social-proof-wrap" class="visible">
+        <h3 class="social-proof-title">VEJA O QUE ESTÃO DIZENDO</h3>
+        <p class="social-proof-subtitle">Confira alguns registros e experiências de clientes.</p>
+        <div class="carousel-outer">
+            <div class="carousel-track" id="carouselTrack">
+                <!--
+                    ┌──────────────────────────────────────────────────────────┐
+                    │  Para colocar suas imagens, troque o background-image    │
+                    │  de cada slide abaixo por:                                │
+                    │  style="background-image:url('SUA_IMAGEM.jpg')"          │
+                    └──────────────────────────────────────────────────────────┘
+                -->
+          <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413650/IMG_2721_deiixe.png)"></div>
+                <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786415810/IMG_2728_krgufa.png)"></div>
+                <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413661/IMG_2729_ijwc0b.png)"></div>
+                <div class="carousel-slide" style="background-image:url(https://res.cloudinary.com/dnponjtdn/image/upload/v1786413646/IMG_2737_beub9l.jpg)"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Botão de WhatsApp — abaixo do carrossel -->
+    <div id="whatsapp-wrap" class="visible">
+        <!--
+            ┌──────────────────────────────────────────────────────────┐
+            │  INSIRA  número no formato internacional, sem espaços  │
+            │  ou símbolos, no lugar de "5500000000000" abaixo:         │
+            │  Ex: 55 + DDD + número → 5551999999999                    │
+            └──────────────────────────────────────────────────────────┘
+        -->
+        <a href="https://wa.me/5500000000000?text=Acabei%20de%20assistir%20o%20v%C3%ADdeo%20e%20gostaria%20de%20tirar%20algumas%20d%C3%BAvidas." class="whatsapp-btn" id="whatsappBtn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.48 1.32 5.01L2.05 22l5.25-1.37a9.94 9.94 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.93 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.55-3.7 8.25-8.25 8.25a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.55 3.71-8.25 8.26-8.25M8.53 6.85c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2.03 0 1.2.87 2.36.99 2.52.12.16 1.7 2.72 4.2 3.71 2.08.82 2.5.66 2.95.62.45-.04 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28-.24-.12-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.12-.16.24-.63.8-.78.96-.14.16-.29.18-.53.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.35-1.67-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.34-.76-1.83-.2-.48-.4-.4-.55-.41-.14 0-.3-.01-.46-.01z"/>
+            </svg>
+            Dúvidas? Fale no WhatsApp!
+        </a>
+    </div>
+
+    <!-- GARANTIA DE 7 DIAS -->
+    <div id="guarantee-wrap" class="visible">
+        <div class="guarantee-icon">🛡️</div>
+        <div class="guarantee-title">GARANTIA DE 7 DIAS</div>
+        <!-- Texto editável -->
+        <p class="guarantee-text">Você tem 7 dias para conhecer o serviço. Caso não fique satisfeito dentro do período de garantia, entre em contato para solicitar o suporte conforme as condições da oferta.</p>
+    </div>
+
+    <!-- ELEMENTOS DE CONFIANÇA / SEGURANÇA -->
+    <div id="trust-wrap" class="visible">
+        <div class="trust-item">🔒 <span>COMPRA SEGURA</span></div>
+        <div class="trust-item">✓ <span>GARANTIA DE 7 DIAS</span></div>
+        <div class="trust-item">⚡ <span>ATENDIMENTO VIA WHATSAPP</span></div>
+        <div class="trust-item">🛡️ <span>SUPORTE AO CLIENTE</span></div>
+    </div>
+
 </div><!-- /.page -->
 
-<!-- CTA — appears at 4:43 -->
-<div id="cta-wrap">
-    <!--
-        ┌──────────────────────────────────────────────────────────┐
-        │  INSIRA o link de destino no atributo href abaixo:       │
-        │  <a href="SEU_LINK_AQUI" ...>                            │
-        └──────────────────────────────────────────────────────────┘
-    -->
-    <a href="https://wa.me/message/SA53EQAF7RTVH1/" class="cta-btn" id="ctaBtn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5v14l11-7z"/>
-        </svg>
-        Acessar a STEAM PREMIUM agora
-    </a>
+<!-- ═══════════════════════════════════════════════════════════
+     POPUP DE CHECKOUT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="checkout-overlay" id="checkoutOverlay">
+    <div class="checkout-modal" onclick="event.stopPropagation()">
+        <button type="button" class="checkout-close" id="checkoutClose" aria-label="Fechar">✕</button>
+
+        <div class="checkout-header">
+            <div class="checkout-eyebrow">Finalizar assinatura</div>
+            <div class="checkout-plan-name" id="checkoutPlanName">—</div>
+            <div class="checkout-plan-price" id="checkoutPlanPrice">R$ 0</div>
+        </div>
+
+        <div class="checkout-error" id="checkoutError"></div>
+
+        <div class="checkout-field">
+            <label class="checkout-label" for="checkoutNome">Nome completo</label>
+            <input type="text" id="checkoutNome" class="checkout-input" placeholder="Digite seu nome">
+        </div>
+
+        <div class="checkout-field">
+            <label class="checkout-label" for="checkoutWhats">WhatsApp</label>
+            <input type="tel" id="checkoutWhats" class="checkout-input" placeholder="(00) 00000-0000">
+        </div>
+
+        <div class="checkout-field">
+            <label class="checkout-label" for="checkoutCpf">CPF</label>
+            <input type="text" id="checkoutCpf" class="checkout-input" placeholder="000.000.000-00" maxlength="14" inputmode="numeric">
+        </div>
+
+        <div class="checkout-field">
+            <label class="checkout-label">Forma de pagamento</label>
+            <div class="checkout-pay-toggle">
+                <div class="pay-option" id="payOptionPix" onclick="selectPaymentMethod('pix')">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.32 2.5a3.6 3.6 0 0 1 2.55 1.06l3.4 3.4a1.2 1.2 0 0 0 .85.35h.6a3.6 3.6 0 0 1 2.55 1.06l1.13 1.13a3.6 3.6 0 0 1 0 5.1l-1.13 1.13a3.6 3.6 0 0 1-2.55 1.06h-.6a1.2 1.2 0 0 0-.85.35l-3.4 3.4a3.6 3.6 0 0 1-5.1 0l-3.4-3.4a1.2 1.2 0 0 0-.85-.35h-.6a3.6 3.6 0 0 1-2.55-1.06L.24 14.6a3.6 3.6 0 0 1 0-5.1l1.13-1.13A3.6 3.6 0 0 1 3.92 7.3h.6c.32 0 .62-.13.85-.35l3.4-3.4A3.6 3.6 0 0 1 11.32 2.5z"/></svg>
+                    Pix
+                </div>
+                <div class="pay-option" id="payOptionCard" onclick="selectPaymentMethod('cartao')">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2m0 14H4v-6h16zm0-10H4V6h16z"/></svg>
+                    Cartão
+                </div>
+            </div>
+        </div>
+
+        <!-- PIX -->
+        <div class="pay-panel" id="panelPix">
+            <div class="pix-box">
+                <div class="pix-code" id="pixCode">Selecione Pix para gerar o código…</div>
+                <button type="button" class="pix-copy-btn" id="pixCopyBtn" onclick="copyPixCode()">Copiar código Pix</button>
+            </div>
+            <p class="pix-note">Copie o código acima e cole no app do seu banco para efetuar o pagamento. Após a confirmação, seu acesso é liberado.</p>
+        </div>
+
+        <!-- CARTÃO -->
+        <div class="pay-panel" id="panelCard">
+            <div class="checkout-field">
+                <label class="checkout-label" for="cardNumero">Número do cartão</label>
+                <input type="text" id="cardNumero" class="checkout-input" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric">
+            </div>
+            <div class="card-row">
+                <div class="checkout-field">
+                    <label class="checkout-label" for="cardValidade">Validade</label>
+                    <input type="text" id="cardValidade" class="checkout-input" placeholder="MM/AA" maxlength="5" inputmode="numeric">
+                </div>
+                <div class="checkout-field">
+                    <label class="checkout-label" for="cardCvv">CVV</label>
+                    <input type="text" id="cardCvv" class="checkout-input" placeholder="000" maxlength="4" inputmode="numeric">
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="checkout-submit" id="checkoutSubmitBtn" onclick="finalizarCompra()">Finalizar Compra</button>
+
+        <div class="checkout-secure">🔒 Ambiente seguro — seus dados estão protegidos</div>
+    </div>
 </div>
 
 <!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
+<!-- SDK do Mercado Pago (tokeniza o cartão no navegador — o número do cartão nunca chega ao seu servidor) -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
     /* ═══════════════════════════════════════════════════════════
        CONFIGURAÇÃO  — edite apenas estas duas constantes
        ═══════════════════════════════════════════════════════════ */
-    const VIDEO_ID    = 'bCz4Ud-b-sA';          // ← ID do vídeo do YouTube
+    const VIDEO_ID    = 'dL2QHhxPSlY';          // ← ID do vídeo do YouTube
     const REDIRECT    = 'https://wa.me/message/SA53EQAF7RTVH1/'; // ← URL de destino
     const CTA_SECOND  = 5;                     // 4 min 43 s  (não altere)
+    /* ═══════════════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════════════
+       CONFIGURAÇÃO DOS PLANOS — edite aqui o número de WhatsApp
+       e a mensagem enviada por cada botão de plano
+       ═══════════════════════════════════════════════════════════ */
+    const PLAN_CONFIG = {
+        whatsappNumber: '5553981021909', // ← DDI + DDD + número, sem espaços/símbolos (não usado mais pelos botões dos planos, mantido para referência)
+        plano99: {
+            nome: 'MODO HISTORIA',
+            preco: 'R$ 29,90',
+            mensagem: 'Quero fazer o pagamento do plano MODO HISTORIA'
+        },
+        plano149: {
+            nome: 'MODO MULTIPLAYER',
+            preco: 'R$ 97,90',
+            mensagem: 'Quero fazer o pagamento do plano MODO MULTIPLAYER'
+        }
+    };
+
+    /* Os botões dos planos agora abrem o pop-up de checkout em vez de ir direto pro WhatsApp */
+    function attachPlanButtons() {
+        document.querySelectorAll('.plan-btn[data-plan]').forEach((btn) => {
+            btn.removeAttribute('href');
+            btn.removeAttribute('target');
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openCheckout(btn.getAttribute('data-plan'));
+            });
+        });
+    }
+    attachPlanButtons();
+    /* ═══════════════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE — Botão "COMPRAR AGORA"
+       Abre o pop-up de checkout já existente, direto no plano de
+       R$ 97,90 (plano149 / MODO MULTIPLAYER). Nenhum checkout novo
+       é criado — apenas conecta ao que já funciona.
+       ═══════════════════════════════════════════════════════════ */
+    document.getElementById('buyNowBtn').addEventListener('click', () => {
+        openCheckout('plano149');
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE — Acordeon "DÚVIDAS FREQUENTES" com um 2º vídeo do
+       YouTube, usando a mesma configuração do vídeo principal
+       (mesmos playerVars, overlay de play, controles próprios).
+       ═══════════════════════════════════════════════════════════ */
+    // ← Cole aqui o ID do vídeo de dúvidas frequentes do YouTube
+    const VIDEO_ID_FAQ = 'COLOQUE_AQUI_O_ID_DO_VIDEO_DE_DUVIDAS';
+
+    let playerFaq          = null;
+    let startedFaq         = false;
+    let isPausedFaq        = false;
+    let userPausedFaq      = false;
+    let speedIndexFaq      = 0;
+    let isFullscreenFaq    = false;
+
+    function ensurePlayerFaqCreated() {
+        if (playerFaq || !(window.YT && YT.Player)) return;
+        playerFaq = new YT.Player('playerFaq', {
+            height: '100%',
+            width:  '100%',
+            videoId: VIDEO_ID_FAQ,
+            playerVars: {
+                autoplay:        1,
+                mute:            1,
+                controls:        0,
+                disablekb:       1,
+                rel:             0,
+                modestbranding:  1,
+                iv_load_policy:  3,
+                fs:              0,
+                playsinline:     1,
+            },
+            events: {
+                onStateChange: onPlayerFaqStateChange,
+            }
+        });
+    }
+
+    function onPlayerFaqStateChange(e) {
+        if (e.data === YT.PlayerState.PAUSED && startedFaq && !userPausedFaq) {
+            setTimeout(() => { try { playerFaq.playVideo(); } catch(_){} }, 200);
+        }
+        if (e.data === YT.PlayerState.PLAYING) { isPausedFaq = false; updatePlayPauseIconFaq(); }
+        if (e.data === YT.PlayerState.PAUSED)  { isPausedFaq = true;  updatePlayPauseIconFaq(); }
+    }
+
+    function startVideoFaq() {
+        if (startedFaq) return;
+        startedFaq = true;
+        document.getElementById('overlayFaq').classList.add('hidden');
+        try {
+            playerFaq.unMute();
+            playerFaq.seekTo(0, true);
+            playerFaq.playVideo();
+        } catch(err) { console.warn('FAQ player not ready yet', err); }
+        document.getElementById('videoControlsFaq').classList.add('active');
+    }
+
+    document.getElementById('overlayFaq').addEventListener('click', () => {
+        ensurePlayerFaqCreated();
+        if (playerFaq && typeof playerFaq.playVideo === 'function') {
+            startVideoFaq();
+        } else {
+            /* API do YouTube ainda carregando — tenta de novo em instantes */
+            setTimeout(() => { ensurePlayerFaqCreated(); startVideoFaq(); }, 600);
+        }
+    });
+
+    function updatePlayPauseIconFaq() {
+        const icon = document.getElementById('iconPlayPauseFaq');
+        if (!icon) return;
+        icon.outerHTML = isPausedFaq
+            ? ICON_PLAY.replace('<svg ', '<svg id="iconPlayPauseFaq" ')
+            : ICON_PAUSE.replace('<svg ', '<svg id="iconPlayPauseFaq" ');
+    }
+
+    document.getElementById('btnPlayPauseFaq').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!startedFaq || !playerFaq) return;
+        if (isPausedFaq) {
+            userPausedFaq = false;
+            playerFaq.playVideo();
+        } else {
+            userPausedFaq = true;
+            playerFaq.pauseVideo();
+        }
+    });
+
+    document.getElementById('btnSpeedFaq').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!startedFaq || !playerFaq) return;
+        speedIndexFaq = (speedIndexFaq + 1) % SPEED_STEPS.length;
+        const rate = SPEED_STEPS[speedIndexFaq];
+        try { playerFaq.setPlaybackRate(rate); } catch(_){}
+        document.getElementById('btnSpeedFaq').textContent = rate + 'x';
+    });
+
+    document.getElementById('btnFullscreenFaq').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const el = document.getElementById('btnFullscreenFaq').closest('.video-card');
+        if (isFullscreenFaq) {
+            isFullscreenFaq = false;
+            document.body.classList.remove('video-fullscreen-active');
+            el.classList.remove('fake-fs-active');
+        } else {
+            isFullscreenFaq = true;
+            document.body.classList.add('video-fullscreen-active');
+            el.classList.add('fake-fs-active');
+        }
+    });
+
+    /* Abre/fecha o acordeon de dúvidas frequentes */
+    document.getElementById('faqToggleBtn').addEventListener('click', () => {
+        const btn    = document.getElementById('faqToggleBtn');
+        const panel  = document.getElementById('faqAccordionPanel');
+        const isOpen = panel.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) ensurePlayerFaqCreated();
+    });
+    /* ═══════════════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════════════
+       POPUP DE CHECKOUT — integração real com Mercado Pago
+       ═══════════════════════════════════════════════════════════ */
+
+    // ── Public Key de produção do Mercado Pago (segura para expor no navegador) ──
+    const MP_PUBLIC_KEY = 'APP_USR-e45dd721-cfe5-47b0-a46d-7d311f476f24';
+    const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+
+    // Endpoint único no Supabase (Edge Function) — substitui os antigos PHPs
+    const MP_ENDPOINT = 'https://iminfhdxpuhitkmylvba.supabase.co/functions/v1/mp-checkout';
+
+    let currentCheckoutPlan   = null;
+    let selectedPaymentMethod = null;
+    let pixCodeGenerated      = false;
+    let paymentMethodIdCartao = null; // ex: "visa", "master" — detectado pelo BIN do cartão
+    let pixPaymentId          = null;
+    let pixPollInterval       = null;
+
+    /* Fica checando a cada 5s se o Pix já foi pago, enquanto o pop-up estiver aberto */
+    function iniciarPollingPix(paymentId) {
+        pararPollingPix();
+        pixPaymentId = paymentId;
+        pixPollInterval = setInterval(async () => {
+            try {
+                const resp = await fetch(MP_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'status', payment_id: paymentId })
+                });
+                const data = await resp.json();
+                if (data.status === 'approved') {
+                    pararPollingPix();
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Purchase', {
+                            content_name: currentCheckoutPlan,
+                            value: valorNumericoDoPlano(),
+                            currency: 'BRL'
+                        });
+                    }
+                    document.querySelector('.checkout-modal').innerHTML =
+                        '<div style="text-align:center; padding:20px 6px;">' +
+                        '<div style="font-size:2.6rem; margin-bottom:10px;">✅</div>' +
+                        '<div class="checkout-plan-name" style="margin-bottom:8px;">Pagamento aprovado!</div>' +
+                        '<p class="pix-note">Seu acesso será liberado em instantes. Qualquer dúvida, fale com a gente pelo WhatsApp.</p>' +
+                        '</div>';
+                }
+            } catch (err) {
+                /* silencioso — tenta de novo no próximo ciclo */
+            }
+        }, 5000);
+    }
+
+    function pararPollingPix() {
+        if (pixPollInterval) {
+            clearInterval(pixPollInterval);
+            pixPollInterval = null;
+        }
+    }
+
+    function openCheckout(planKey) {
+        const cfg = PLAN_CONFIG[planKey];
+        if (!cfg) return;
+        currentCheckoutPlan = planKey;
+        pararPollingPix();
+
+        document.getElementById('checkoutPlanName').textContent  = cfg.nome;
+        document.getElementById('checkoutPlanPrice').textContent = cfg.preco;
+
+        /* reseta o formulário toda vez que abre */
+        document.getElementById('checkoutNome').value    = '';
+        document.getElementById('checkoutWhats').value   = '';
+        document.getElementById('checkoutCpf').value     = '';
+        document.getElementById('cardNumero').value      = '';
+        document.getElementById('cardValidade').value    = '';
+        document.getElementById('cardCvv').value         = '';
+        hideCheckoutError();
+
+        selectedPaymentMethod = null;
+        pixCodeGenerated = false;
+        paymentMethodIdCartao = null;
+        document.getElementById('pixCode').textContent = 'Selecione Pix para gerar o código…';
+        document.getElementById('payOptionPix').classList.remove('active');
+        document.getElementById('payOptionCard').classList.remove('active');
+        document.getElementById('panelPix').classList.remove('active');
+        document.getElementById('panelCard').classList.remove('active');
+        document.getElementById('pixCopyBtn').classList.remove('copied');
+        document.getElementById('pixCopyBtn').textContent = 'Copiar código Pix';
+
+        const submitBtn = document.getElementById('checkoutSubmitBtn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Finalizar Compra';
+
+        const overlay = document.getElementById('checkoutOverlay');
+        overlay.classList.add('active');
+        requestAnimationFrame(() => overlay.classList.add('show'));
+        document.body.style.overflow = 'hidden';
+
+        if (typeof fbq === 'function') {
+            fbq('track', 'InitiateCheckout', {
+                content_name: planKey,
+                value: valorNumericoDoPlano(),
+                currency: 'BRL'
+            });
+        }
+    }
+
+    function closeCheckout() {
+        const overlay = document.getElementById('checkoutOverlay');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        setTimeout(() => overlay.classList.remove('active'), 250);
+        pararPollingPix();
+    }
+
+    document.getElementById('checkoutOverlay').addEventListener('click', closeCheckout);
+    document.getElementById('checkoutClose').addEventListener('click', closeCheckout);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeCheckout();
+    });
+
+    function selectPaymentMethod(method) {
+        selectedPaymentMethod = method;
+        document.getElementById('payOptionPix').classList.toggle('active', method === 'pix');
+        document.getElementById('payOptionCard').classList.toggle('active', method === 'cartao');
+        document.getElementById('panelPix').classList.toggle('active', method === 'pix');
+        document.getElementById('panelCard').classList.toggle('active', method === 'cartao');
+    }
+
+    /* Extrai o valor numérico (ex: "R$ 99" → 99) pra mandar pro backend */
+    function valorNumericoDoPlano() {
+        const cfg = PLAN_CONFIG[currentCheckoutPlan];
+        if (!cfg) return 0;
+        return parseFloat(cfg.preco.replace('R$', '').replace(',', '.').trim());
+    }
+
+    function dadosComunsValidos() {
+        const nome  = document.getElementById('checkoutNome').value.trim();
+        const whats = document.getElementById('checkoutWhats').value.trim();
+        const cpf   = document.getElementById('checkoutCpf').value.replace(/\D/g, '');
+
+        if (!nome) { showCheckoutError('Preencha seu nome.'); return null; }
+        if (whats.replace(/\D/g, '').length < 10) { showCheckoutError('Informe um WhatsApp válido.'); return null; }
+        if (cpf.length !== 11) { showCheckoutError('Informe um CPF válido.'); return null; }
+
+        return { nome, whatsapp: whats, cpf };
+    }
+
+    /* ── PIX real — chama o backend, que fala com a API do Mercado Pago ── */
+    async function gerarPixReal() {
+        hideCheckoutError();
+        const dados = dadosComunsValidos();
+        if (!dados) return;
+
+        const pixBox = document.getElementById('pixCode');
+        pixBox.textContent = 'Gerando código Pix…';
+
+        try {
+            const resp = await fetch(MP_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'pix',
+                    nome: dados.nome,
+                    whatsapp: dados.whatsapp,
+                    cpf: dados.cpf,
+                    valor: valorNumericoDoPlano(),
+                    plano: PLAN_CONFIG[currentCheckoutPlan].nome,
+                }),
+            });
+            const data = await resp.json();
+
+            if (!resp.ok) {
+                pixBox.textContent = 'Selecione Pix para gerar o código…';
+                showCheckoutError(data.erro || 'Não foi possível gerar o Pix. Tente novamente.');
+                return;
+            }
+
+            pixBox.textContent = data.qr_code;
+            pixCodeGenerated = true;
+            iniciarPollingPix(data.payment_id);
+        } catch (err) {
+            pixBox.textContent = 'Selecione Pix para gerar o código…';
+            showCheckoutError('Erro de conexão ao gerar o Pix. Verifique o backend.');
+        }
+    }
+
+    function copyPixCode() {
+        const code = document.getElementById('pixCode').textContent;
+        const btn  = document.getElementById('pixCopyBtn');
+
+        const markCopied = () => {
+            btn.textContent = 'Código copiado ✓';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copiar código Pix';
+                btn.classList.remove('copied');
+            }, 2500);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(markCopied).catch(() => fallbackCopy(code, markCopied));
+        } else {
+            fallbackCopy(code, markCopied);
+        }
+    }
+
+    function fallbackCopy(text, cb) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); } catch(_) {}
+        document.body.removeChild(temp);
+        cb();
+    }
+
+    function showCheckoutError(msg) {
+        const box = document.getElementById('checkoutError');
+        box.textContent = msg;
+        box.classList.add('show');
+    }
+    function hideCheckoutError() {
+        document.getElementById('checkoutError').classList.remove('show');
+    }
+
+    /* Quando escolhe Pix, gera o código de verdade na hora */
+    document.getElementById('payOptionPix').addEventListener('click', () => {
+        if (!pixCodeGenerated) gerarPixReal();
+    });
+
+    /* Máscaras simples dos campos */
+    document.getElementById('checkoutWhats').addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '').substring(0, 11);
+        if (v.length > 6) v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7)}`;
+        else if (v.length > 2) v = `(${v.substring(0,2)}) ${v.substring(2)}`;
+        e.target.value = v;
+    });
+    document.getElementById('checkoutCpf').addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '').substring(0, 11);
+        if (v.length > 9) v = `${v.substring(0,3)}.${v.substring(3,6)}.${v.substring(6,9)}-${v.substring(9)}`;
+        else if (v.length > 6) v = `${v.substring(0,3)}.${v.substring(3,6)}.${v.substring(6)}`;
+        else if (v.length > 3) v = `${v.substring(0,3)}.${v.substring(3)}`;
+        e.target.value = v;
+    });
+    document.getElementById('cardNumero').addEventListener('input', async (e) => {
+        let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+        e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+
+        // Descobre a bandeira (visa, master...) pelos 6 primeiros dígitos assim que possível
+        if (v.length >= 6) {
+            try {
+                const methods = await mp.getPaymentMethods({ bin: v.substring(0, 6) });
+                if (methods.results && methods.results.length) {
+                    paymentMethodIdCartao = methods.results[0].id;
+                }
+            } catch (_) { /* segue sem bandeira detectada; a API acusa erro se faltar */ }
+        }
+    });
+    document.getElementById('cardValidade').addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+        if (v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
+        e.target.value = v;
+    });
+    document.getElementById('cardCvv').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+    });
+
+    /* ── CARTÃO real — tokeniza no navegador (SDK do Mercado Pago) e
+       manda só o token pro backend. O número do cartão NUNCA passa
+       pelo seu servidor. ── */
+    async function pagarComCartaoReal(dados) {
+        const numero    = document.getElementById('cardNumero').value.replace(/\D/g, '');
+        const validade  = document.getElementById('cardValidade').value;
+        const cvv       = document.getElementById('cardCvv').value;
+
+        if (numero.length < 13) { showCheckoutError('Número de cartão inválido.'); return; }
+        if (!/^\d{2}\/\d{2}$/.test(validade)) { showCheckoutError('Validade inválida (use MM/AA).'); return; }
+        if (cvv.length < 3) { showCheckoutError('CVV inválido.'); return; }
+        if (!paymentMethodIdCartao) { showCheckoutError('Não foi possível identificar a bandeira do cartão.'); return; }
+
+        const [mes, ano] = validade.split('/');
+        const btn = document.getElementById('checkoutSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Processando...';
+
+        try {
+            const cardToken = await mp.createCardToken({
+                cardNumber: numero,
+                cardholderName: dados.nome,
+                cardExpirationMonth: mes,
+                cardExpirationYear: '20' + ano,
+                securityCode: cvv,
+                identificationType: 'CPF',
+                identificationNumber: dados.cpf,
+            });
+
+            const resp = await fetch(MP_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'cartao',
+                    nome: dados.nome,
+                    whatsapp: dados.whatsapp,
+                    cpf: dados.cpf,
+                    valor: valorNumericoDoPlano(),
+                    plano: PLAN_CONFIG[currentCheckoutPlan].nome,
+                    card_token: cardToken.id,
+                    payment_method_id: paymentMethodIdCartao,
+                    installments: 1,
+                }),
+            });
+            const data = await resp.json();
+
+            btn.disabled = false;
+            btn.textContent = 'Finalizar Compra';
+
+            if (!resp.ok) {
+                showCheckoutError(data.erro || 'Pagamento recusado. Confira os dados do cartão.');
+                return;
+            }
+
+            if (data.status === 'approved') {
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Purchase', {
+                        content_name: currentCheckoutPlan,
+                        value: valorNumericoDoPlano(),
+                        currency: 'BRL'
+                    });
+                }
+                document.querySelector('.checkout-modal').innerHTML =
+                    '<div style="text-align:center; padding:20px 6px;">' +
+                    '<div style="font-size:2.6rem; margin-bottom:10px;">✅</div>' +
+                    '<div class="checkout-plan-name" style="margin-bottom:8px;">Pagamento aprovado!</div>' +
+                    '<p class="pix-note">Seu acesso será liberado em instantes. Qualquer dúvida, fale com a gente pelo WhatsApp.</p>' +
+                    '</div>';
+            } else {
+                showCheckoutError('Pagamento com status "' + data.status + '". Tente novamente ou use outro cartão.');
+            }
+        } catch (err) {
+            btn.disabled = false;
+            btn.textContent = 'Finalizar Compra';
+            showCheckoutError('Erro ao processar o cartão. Verifique os dados e tente de novo.');
+        }
+    }
+
+    /* ── Botão "Finalizar Compra" ── */
+    async function finalizarCompra() {
+        hideCheckoutError();
+        const dados = dadosComunsValidos();
+        if (!dados) return;
+
+        if (!selectedPaymentMethod) { showCheckoutError('Escolha uma forma de pagamento.'); return; }
+
+        if (selectedPaymentMethod === 'pix') {
+            if (!pixCodeGenerated) { showCheckoutError('Aguarde o código Pix ser gerado.'); return; }
+            showCheckoutError('Após pagar o Pix copiado, a confirmação chega automaticamente pelo webhook — pode fechar esta janela.');
+            return;
+        }
+
+        if (selectedPaymentMethod === 'cartao') {
+            await pagarComCartaoReal(dados);
+        }
+    }
     /* ═══════════════════════════════════════════════════════════ */
 
     let player;
     let progressInterval = null;
     let ctaTimer         = null;
     let started          = false;
+
+    /* Ajuste 1 / 3 — estado dos controles e da tela cheia */
+    let isPaused      = false;
+    let userPaused     = false;
+    let speedIndex     = 0;
+    const SPEED_STEPS  = [1, 1.5, 2];
+    let isFullscreen   = false;
+    let videoEnded      = false;
+    let ctaShown        = false;
 
     /* ── YouTube Player ready ── */
     function onYouTubeIframeAPIReady() {
@@ -396,9 +1831,27 @@
     }
 
     function onPlayerStateChange(e) {
-        /* Keep playing if paused externally */
-        if (e.data === YT.PlayerState.PAUSED && started) {
+        /* Keep playing if paused externally (mas não se foi o próprio usuário
+           que pausou pelo botão de play/pause customizado) */
+        if (e.data === YT.PlayerState.PAUSED && started && !userPaused) {
             setTimeout(() => { try { player.playVideo(); } catch(_){} }, 200);
+        }
+
+        if (e.data === YT.PlayerState.PLAYING) {
+            isPaused = false;
+            updatePlayPauseIcon();
+        }
+        if (e.data === YT.PlayerState.PAUSED) {
+            isPaused = true;
+            updatePlayPauseIcon();
+        }
+
+        /* AJUSTE 1: quando o vídeo termina, se o CTA já foi liberado,
+           sai da tela cheia automaticamente. Caso contrário, marca a flag
+           e a saída acontece quando o CTA aparecer (ver showCTA). */
+        if (e.data === YT.PlayerState.ENDED) {
+            videoEnded = true;
+            if (ctaShown) exitFakeFullscreen();
         }
     }
 
@@ -418,6 +1871,12 @@
 
         startFakeProgress();
         scheduleCTA();
+
+        /* Mostra os controles customizados */
+        document.getElementById('videoControls').classList.add('active');
+
+        /* A tela cheia agora só entra se a pessoa clicar no botão de
+           tela cheia dos controles customizados — não abre sozinha. */
     }
 
     /* ── Fake progress bar ──────────────────────────────────────
@@ -436,6 +1895,7 @@
     let elapsedSec = 0;
 
     function startFakeProgress() {
+        clearInterval(progressInterval);
         progressInterval = setInterval(() => {
             elapsedSec += 0.5;
             const pct = easeProgress(elapsedSec);
@@ -461,12 +1921,103 @@
         setProgressUI(100);
         document.querySelector('.progress-label').textContent = 'Acesso liberado!';
 
-        /* Reveal CTA */
-        document.getElementById('cta-wrap').classList.add('visible');
+        /* AJUSTE 3: o conteúdo abaixo do vídeo (comprar agora, dúvidas,
+           garantia, confiança, provas sociais) já fica liberado desde o
+           início da página — não depende mais de o CTA aparecer. */
 
-        /* Update link with the redirect URL */
-        document.getElementById('ctaBtn').href = REDIRECT;
+        /* AJUSTE 1: vídeo terminou E botão liberado → sai da tela cheia */
+        ctaShown = true;
+        if (videoEnded) exitFakeFullscreen();
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 3 — Controles customizados
+       ═══════════════════════════════════════════════════════════ */
+    const ICON_PLAY  = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>';
+    const ICON_PAUSE = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+    function updatePlayPauseIcon() {
+        const icon = document.getElementById('iconPlayPause');
+        if (icon) icon.outerHTML = isPaused ? ICON_PLAY.replace('<svg ', '<svg id="iconPlayPause" ') : ICON_PAUSE.replace('<svg ', '<svg id="iconPlayPause" ');
+    }
+
+    document.getElementById('btnPlayPause').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!started || !player) return;
+        if (isPaused) {
+            userPaused = false;
+            player.playVideo();
+            startFakeProgress(); /* retoma a barra de progresso do ponto em que parou */
+        } else {
+            userPaused = true;
+            player.pauseVideo();
+            clearInterval(progressInterval); /* pausa a barra de progresso junto com o vídeo */
+        }
+    });
+
+    document.getElementById('btnSpeed').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!started || !player) return;
+        speedIndex = (speedIndex + 1) % SPEED_STEPS.length;
+        const rate = SPEED_STEPS[speedIndex];
+        try { player.setPlaybackRate(rate); } catch(_){}
+        document.getElementById('btnSpeed').textContent = rate + 'x';
+    });
+
+    document.getElementById('btnFullscreen').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isFullscreen) exitFakeFullscreen(); else enterFakeFullscreen();
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 1 — Tela cheia falsa (via CSS, sem controles nativos)
+       ═══════════════════════════════════════════════════════════ */
+    function enterFakeFullscreen() {
+        if (isFullscreen) return;
+        isFullscreen = true;
+        const el = document.querySelector('.video-card');
+        document.body.classList.add('video-fullscreen-active');
+        el.classList.add('fake-fs-active');
+    }
+
+    function exitFakeFullscreen() {
+        if (!isFullscreen) return;
+        isFullscreen = false;
+        const el = document.querySelector('.video-card');
+        document.body.classList.remove('video-fullscreen-active');
+        el.classList.remove('fake-fs-active');
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 2 — Carrossel de prova social (arrastar para o lado)
+       ═══════════════════════════════════════════════════════════ */
+    (function initCarousel() {
+        const track = document.getElementById('carouselTrack');
+        if (!track) return;
+
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+
+        track.addEventListener('mousedown', (e) => {
+            isDown = true;
+            track.classList.add('dragging');
+            startX = e.pageX;
+            scrollStart = track.scrollLeft;
+        });
+        window.addEventListener('moup', () => {
+            isDown = false;
+            track.classList.remove('dragging');
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const delta = e.pageX - startX;
+            track.scrollLeft = scrollStart - delta;
+        });
+
+        /* Touch já funciona nativamente via overflow-x + scroll-snap */
+    })();
 
     /* ── Prevent right-click context menu on the video area ── */
     document.addEventListener('contextmenu', e => {
