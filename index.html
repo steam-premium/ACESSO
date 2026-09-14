@@ -615,17 +615,17 @@
             font-size: 1.15rem;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            background: linear-gradient(135deg, #ff2733 0%, var(--red) 55%, #a80710 100%);
-            border-radius: 6px;
+            background: linear-gradient(135deg, #2ecc71 0%, #1fa855 55%, #167a3e 100%);
+            border-radius: 8px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 0 2px var(--red-dim), 0 0 32px var(--red-glow), 0 4px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 0 0 2px rgba(46,204,113,0.25), 0 0 28px rgba(46,204,113,0.45), 0 4px 24px rgba(0,0,0,0.6);
             transition: box-shadow 0.25s ease, transform 0.25s ease;
-            animation: pulse-btn 1.8s ease-in-out infinite;
         }
+        .buy-now-btn svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
         .buy-now-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 0 2px var(--red-dim), 0 0 46px var(--red-glow), 0 4px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 0 0 2px rgba(46,204,113,0.4), 0 0 40px rgba(46,204,113,0.6), 0 4px 24px rgba(0,0,0,0.6);
         }
 
         /* ─── ACORDEON: DÚVIDAS FREQUENTES ────────────────────── */
@@ -640,25 +640,29 @@
             gap: 10px;
             width: 100%;
             padding: 15px 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #ff2733 0%, var(--red) 55%, #a80710 100%);
+            border: none;
             border-radius: 6px;
-            color: var(--text);
+            color: #fff;
             font-family: 'Barlow Condensed', sans-serif;
             font-weight: 700;
             font-size: 0.98rem;
             letter-spacing: 0.05em;
             text-transform: uppercase;
             cursor: pointer;
-            transition: border-color 0.2s ease, background 0.2s ease;
+            box-shadow: 0 0 0 2px var(--red-dim), 0 0 24px var(--red-glow), 0 4px 18px rgba(0,0,0,0.5);
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
         }
-        .faq-toggle-btn:hover { border-color: rgba(255,255,255,0.18); }
+        .faq-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 0 2px var(--red-dim), 0 0 34px var(--red-glow), 0 4px 18px rgba(0,0,0,0.5);
+        }
         .faq-toggle-icon {
             display: inline-flex;
             transition: transform 0.3s ease;
             flex-shrink: 0;
         }
-        .faq-toggle-icon svg { width: 18px; height: 18px; fill: var(--red); }
+        .faq-toggle-icon svg { width: 18px; height: 18px; fill: #fff; }
         .faq-toggle-btn.open .faq-toggle-icon { transform: rotate(180deg); }
 
         .faq-accordion-panel {
@@ -1085,13 +1089,17 @@
 
         <!-- Abre o pop-up de checkout já existente, sempre no plano de R$ 49,90 -->
         <button type="button" class="buy-now-btn" id="buyNowBtn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 20a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM17 20a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM7.16 6l.94 2H19a1 1 0 0 1 .96 1.28l-1.5 5A1 1 0 0 1 17.5 15H9a1 1 0 0 1-.96-.72L5.21 5H3a1 1 0 0 1 0-2h3a1 1 0 0 1 .96.72L7.16 6z"/></svg>
             COMPRAR AGORA
         </button>
 
         <!-- Acordeon de dúvidas frequentes -->
         <div class="faq-accordion">
             <button type="button" class="faq-toggle-btn" id="faqToggleBtn" aria-expanded="false" aria-controls="faqAccordionPanel">
-                <span>DÚVIDAS FREQUENTES</span>
+                <span style="display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px; height:18px; fill:#fff; flex-shrink:0;"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm.1-4.9c-.13.11-.26.21-.38.32-.47.42-.72.85-.72 1.58h-2v-.5c0-.83.3-1.44.9-1.98.15-.14.32-.28.5-.42.6-.46 1-.85 1-1.5 0-.83-.67-1.5-1.5-1.5S8.9 9.17 8.9 10H6.9a4.1 4.1 0 0 1 8.2 0c0 1.15-.58 1.83-1 2.1z"/></svg>
+                    DÚVIDAS FREQUENTES
+                </span>
                 <span class="faq-toggle-icon">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
                 </span>
@@ -2026,8 +2034,13 @@
         if (e.target.closest('.video-card')) e.preventDefault();
     });
 
-    /* ── Prevent keyboard shortcuts that might trigger YouTube ── */
+    /* ── Prevent keyboard shortcuts that might trigger YouTube ──
+       AJUSTE 1: não bloquear teclas quando o usuário está digitando
+       em um campo de formulário (ex.: nome completo no checkout),
+       senão a barra de espaço fica travada nesses campos. ── */
     document.addEventListener('keydown', e => {
+        const tag = e.target && e.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
         const blocked = [' ', 'k', 'K', 'ArrowLeft', 'ArrowRight', 'j', 'J', 'l', 'L', 'f', 'F', 'm', 'M'];
         if (blocked.includes(e.key)) e.preventDefault();
     });
