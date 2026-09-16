@@ -1198,8 +1198,8 @@
         </div>
 
         <div class="checkout-field">
-            <label class="checkout-label" for="checkoutWhats">WhatsApp</label>
-            <input type="tel" id="checkoutWhats" class="checkout-input" placeholder="(00) 00000-0000">
+            <label class="checkout-label" for="checkoutEmail">E-mail</label>
+            <input type="email" id="checkoutEmail" class="checkout-input" placeholder="seuemail@exemplo.com" inputmode="email">
         </div>
 
         <div class="checkout-field">
@@ -1501,7 +1501,7 @@
 
         /* reseta o formulário toda vez que abre */
         document.getElementById('checkoutNome').value    = '';
-        document.getElementById('checkoutWhats').value   = '';
+        document.getElementById('checkoutEmail').value   = '';
         document.getElementById('checkoutCpf').value     = '';
         document.getElementById('cardNumero').value      = '';
         document.getElementById('cardValidade').value    = '';
@@ -1568,14 +1568,14 @@
 
     function dadosComunsValidos() {
         const nome  = document.getElementById('checkoutNome').value.trim();
-        const whats = document.getElementById('checkoutWhats').value.trim();
+        const email = document.getElementById('checkoutEmail').value.trim();
         const cpf   = document.getElementById('checkoutCpf').value.replace(/\D/g, '');
 
         if (!nome) { showCheckoutError('Preencha seu nome.'); return null; }
-        if (whats.replace(/\D/g, '').length < 10) { showCheckoutError('Informe um WhatsApp válido.'); return null; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showCheckoutError('Informe um e-mail válido.'); return null; }
         if (cpf.length !== 11) { showCheckoutError('Informe um CPF válido.'); return null; }
 
-        return { nome, whatsapp: whats, cpf };
+        return { nome, email, cpf };
     }
 
     /* ── PIX real — chama o backend, que fala com a API do Mercado Pago ── */
@@ -1594,7 +1594,7 @@
                 body: JSON.stringify({
                     action: 'pix',
                     nome: dados.nome,
-                    whatsapp: dados.whatsapp,
+                    email: dados.email,
                     cpf: dados.cpf,
                     valor: valorNumericoDoPlano(),
                     plano: PLAN_CONFIG[currentCheckoutPlan].nome,
@@ -1664,12 +1664,6 @@
     });
 
     /* Máscaras simples dos campos */
-    document.getElementById('checkoutWhats').addEventListener('input', (e) => {
-        let v = e.target.value.replace(/\D/g, '').substring(0, 11);
-        if (v.length > 6) v = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7)}`;
-        else if (v.length > 2) v = `(${v.substring(0,2)}) ${v.substring(2)}`;
-        e.target.value = v;
-    });
     document.getElementById('checkoutCpf').addEventListener('input', (e) => {
         let v = e.target.value.replace(/\D/g, '').substring(0, 11);
         if (v.length > 9) v = `${v.substring(0,3)}.${v.substring(3,6)}.${v.substring(6,9)}-${v.substring(9)}`;
@@ -1735,7 +1729,7 @@
                 body: JSON.stringify({
                     action: 'cartao',
                     nome: dados.nome,
-                    whatsapp: dados.whatsapp,
+                    email: dados.email,
                     cpf: dados.cpf,
                     valor: valorNumericoDoPlano(),
                     plano: PLAN_CONFIG[currentCheckoutPlan].nome,
