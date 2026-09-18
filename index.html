@@ -242,6 +242,15 @@
             height: var(--progress-h);
             background: rgba(255,255,255,0.1);
             position: relative;
+            cursor: pointer;
+            touch-action: none; /* AJUSTE 1: permite arrastar (somente para voltar) em toque */
+        }
+        /* Área de toque um pouco maior, sem alterar a altura visual da barra */
+        .progress-track::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            top: -8px; bottom: -8px;
         }
         .progress-fill {
             height: 100%;
@@ -1054,7 +1063,7 @@
         </div>
 
         <!-- Progress bar -->
-        <div class="progress-track">
+        <div class="progress-track" id="progressTrack">
             <div class="progress-fill" id="progressFill"></div>
         </div>
         <div class="progress-meta">
@@ -1137,7 +1146,7 @@
                     </div>
 
                     <!-- Progress bar -->
-                    <div class="progress-track">
+                    <div class="progress-track" id="progressTrackFaq">
                         <div class="progress-fill" id="progressFillFaq"></div>
                     </div>
                     <div class="progress-meta">
@@ -1352,24 +1361,32 @@
                 playsinline:     1,
             },
             events: {
+                onReady:       onPlayerFaqReady,
                 onStateChange: onPlayerFaqStateChange,
             }
         });
+    }
+
+    /* AJUSTE 3: força também a maior qualidade disponível no vídeo de dúvidas */
+    function onPlayerFaqReady(e) {
+        forceMaxQuality(playerFaq);
     }
 
     function onPlayerFaqStateChange(e) {
         if (e.data === YT.PlayerState.PAUSED && startedFaq && !userPausedFaq) {
             setTimeout(() => { try { playerFaq.playVideo(); } catch(_){} }, 200);
         }
-        if (e.data === YT.PlayerState.PLAYING) { isPausedFaq = false; updatePlayPauseIconFaq(); }
+        if (e.data === YT.PlayerState.PLAYING) { isPausedFaq = false; updatePlayPauseIconFaq(); forceMaxQuality(playerFaq); }
         if (e.data === YT.PlayerState.PAUSED)  { isPausedFaq = true;  updatePlayPauseIconFaq(); }
     }
 
     let progressIntervalFaq = null;
+    let maxProgressPctFaq   = 0; /* AJUSTE 1: guarda o ponto mais avançado já assistido */
 
     function setProgressUIFaq(pct) {
         const fill  = document.getElementById('progressFillFaq');
         const label = document.getElementById('progressPctFaq');
+        if (pct > maxProgressPctFaq) maxProgressPctFaq = pct;
         if (fill)  fill.style.width = pct.toFixed(1) + '%';
         if (label) label.textContent = Math.round(pct) + '%';
     }
@@ -1875,8 +1892,18 @@
         });
     }
 
+    /* AJUSTE 3: força a maior qualidade disponível (a mesma em que o
+       vídeo foi postado no YouTube). */
+    function forceMaxQuality(p) {
+        try {
+            const levels = p.getAvailableQualityLevels();
+            if (levels && levels.length) p.setPlaybackQuality(levels[0]);
+        } catch(_) {}
+    }
+
     function onPlayerReady(e) {
         /* Video is muted + auto-playing in background; overlay is shown */
+        forceMaxQuality(player);
     }
 
     function onPlayerStateChange(e) {
@@ -1889,6 +1916,7 @@
         if (e.data === YT.PlayerState.PLAYING) {
             isPaused = false;
             updatePlayPauseIcon();
+            forceMaxQuality(player);
         }
         if (e.data === YT.PlayerState.PAUSED) {
             isPaused = true;
@@ -1907,6 +1935,16 @@
     /* ── User clicks overlay → unmute & start experience ── */
     function startVideo() {
         if (started) return;
+
+        /* AJUSTE 4 (correção de bug): às vezes o player do YouTube ainda não
+           terminou de ser criado quando a pessoa clica. Nesse caso, em vez de
+           marcar "started" e falhar silenciosamente (tela preta, sem som),
+           tenta novamente em instantes até o player estar realmente pronto. */
+        if (!player || typeof player.playVideo !== 'function') {
+            setTimeout(startVideo, 250);
+            return;
+        }
+
         started = true;
 
         /* Evita interferência: pausa o vídeo de dúvidas enquanto o principal toca */
@@ -1916,13 +1954,21 @@
         }
 
         const overlay = document.getElementById('overlay');
-        overlay.classList.add('hidden');
 
         try {
             player.unMute();
             player.seekTo(0, true);
             player.playVideo();
-        } catch(err) { console.warn('Player not ready yet', err); }
+        } catch(err) {
+            /* Se algo falhar aqui, desfaz o "started" e tenta de novo,
+               em vez de deixar o vídeo mudo/preto sem possibilidade de retry. */
+            console.warn('Player not ready yet', err);
+            started = false;
+            setTimeout(startVideo, 250);
+            return;
+        }
+
+        overlay.classList.add('hidden');
 
         startFakeProgress();
         scheduleCTA();
@@ -1930,8 +1976,9 @@
         /* Mostra os controles customizados */
         document.getElementById('videoControls').classList.add('active');
 
-        /* A tela cheia agora só entra se a pessoa clicar no botão de
-           tela cheia dos controles customizados — não abre sozinha. */
+        /* AJUSTE 2: ao iniciar o vídeo, abre automaticamente a tela cheia
+           (e tenta girar o celular para paisagem, quando o aparelho permitir). */
+        enterFakeFullscreen();
     }
 
     /* ── Fake progress bar ──────────────────────────────────────
@@ -1958,9 +2005,12 @@
         }, 500);
     }
 
+    let maxProgressPct = 0; /* AJUSTE 1: guarda o ponto mais avançado já alcançado */
+
     function setProgressUI(pct) {
         const fill = document.getElementById('progressFill');
         const label = document.getElementById('progressPct');
+        if (pct > maxProgressPct) maxProgressPct = pct;
         if (fill)  fill.style.width = pct.toFixed(1) + '%';
         if (label) label.textContent = Math.round(pct) + '%';
     }
@@ -1984,6 +2034,87 @@
         ctaShown = true;
         if (videoEnded) exitFakeFullscreen();
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       AJUSTE 1 — Permitir voltar o vídeo pela barra de progresso.
+       Nunca é possível avançar além do ponto mais avançado já
+       alcançado — somente voltar. Barra e porcentagem acompanham.
+       ═══════════════════════════════════════════════════════════ */
+    function setupRewindTrack(trackId, isReady, getMaxPct, onRewind) {
+        const track = document.getElementById(trackId);
+        if (!track) return;
+        let dragging = false;
+
+        function pctFromClientX(clientX) {
+            const rect = track.getBoundingClientRect();
+            let frac = (clientX - rect.left) / rect.width;
+            frac = Math.max(0, Math.min(1, frac));
+            return frac * 100;
+        }
+
+        function attemptSeek(clientX) {
+            if (!isReady()) return;
+            const targetPct = pctFromClientX(clientX);
+            const maxPct = getMaxPct();
+            /* Só permite ir para trás — nunca ultrapassar o ponto já alcançado */
+            if (targetPct < maxPct) onRewind(targetPct);
+        }
+
+        track.addEventListener('pointerdown', (e) => {
+            if (!isReady()) return;
+            dragging = true;
+            try { track.setPointerCapture(e.pointerId); } catch(_) {}
+            attemptSeek(e.clientX);
+        });
+        track.addEventListener('pointermove', (e) => {
+            if (!dragging) return;
+            attemptSeek(e.clientX);
+        });
+        track.addEventListener('pointerup',     () => { dragging = false; });
+        track.addEventListener('pointercancel', () => { dragging = false; });
+    }
+
+    /* Vídeo principal (progresso "simulado" que libera o CTA) */
+    setupRewindTrack(
+        'progressTrack',
+        () => started,
+        () => maxProgressPct,
+        (targetPct) => {
+            const cappedPct    = Math.min(targetPct, 94.9);
+            const newElapsed   = -Math.log(1 - cappedPct / 95) / K;
+            const deltaSeconds = elapsedSec - newElapsed;
+            elapsedSec = Math.max(0, newElapsed);
+            setProgressUI(targetPct);
+
+            /* Volta o vídeo de verdade na mesma proporção */
+            if (player && typeof player.getCurrentTime === 'function' && typeof player.seekTo === 'function') {
+                try {
+                    const newTime = Math.max(0, player.getCurrentTime() - deltaSeconds);
+                    player.seekTo(newTime, true);
+                    player.playVideo();
+                } catch(_) {}
+            }
+            videoEnded = false;
+            if (!userPaused) startFakeProgress();
+        }
+    );
+
+    /* Vídeo de dúvidas (FAQ) — progresso real, mesma lógica de "só voltar" */
+    setupRewindTrack(
+        'progressTrackFaq',
+        () => startedFaq,
+        () => maxProgressPctFaq,
+        (targetPct) => {
+            if (!playerFaq || typeof playerFaq.getDuration !== 'function') return;
+            const dur = playerFaq.getDuration();
+            if (!dur) return;
+            try {
+                playerFaq.seekTo((targetPct / 100) * dur, true);
+                playerFaq.playVideo();
+            } catch(_) {}
+            setProgressUIFaq(targetPct);
+        }
+    );
 
     /* ═══════════════════════════════════════════════════════════
        AJUSTE 3 — Controles customizados
@@ -2038,6 +2169,33 @@
         const el = document.querySelector('.video-card');
         document.body.classList.add('video-fullscreen-active');
         el.classList.add('fake-fs-active');
+
+        /* AJUSTE 2: além da tela cheia "falsa" (CSS, funciona em qualquer
+           aparelho), tenta também a Fullscreen API nativa + travar a
+           orientação em paisagem — quando o navegador/celular permitir
+           (ex.: Android/Chrome). Se não for suportado, a experiência
+           continua normalmente pela tela cheia via CSS acima. */
+        try {
+            const req = el.requestFullscreen || el.webkitRequestFullscreen ||
+                        el.mozRequestFullScreen || el.msRequestFullscreen;
+            const tryLockLandscape = () => {
+                try {
+                    if (screen.orientation && typeof screen.orientation.lock === 'function') {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                } catch(_) {}
+            };
+            if (req) {
+                const result = req.call(el);
+                if (result && typeof result.then === 'function') {
+                    result.then(tryLockLandscape).catch(() => {});
+                } else {
+                    tryLockLandscape();
+                }
+            } else {
+                tryLockLandscape();
+            }
+        } catch(_) {}
     }
 
     function exitFakeFullscreen() {
@@ -2046,6 +2204,19 @@
         const el = document.querySelector('.video-card');
         document.body.classList.remove('video-fullscreen-active');
         el.classList.remove('fake-fs-active');
+
+        try {
+            if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+                screen.orientation.unlock();
+            }
+            const isNativeFs = document.fullscreenElement || document.webkitFullscreenElement ||
+                                document.mozFullScreenElement || document.msFullscreenElement;
+            if (isNativeFs) {
+                const exit = document.exitFullscreen || document.webkitExitFullscreen ||
+                             document.mozCancelFullScreen || document.msExitFullscreen;
+                if (exit) exit.call(document);
+            }
+        } catch(_) {}
     }
 
     /* ═══════════════════════════════════════════════════════════
